@@ -7,7 +7,8 @@
     "test": "jest --verbose --coverage",
     "start": "node index.js",
     "watch": "nodemon index.js",
-    "startDB": "mkdir -p ./data/db && mongod --dbpath ./data/db"
+    "startDB": "mkdir -p ./data/db && mongod --dbpath ./data/db",
+    "lint": "eslint '**/*.js'"
   },
   "keywords": [],
   "author": "",
@@ -24,5 +25,8 @@
     "morgan": "^1.9.1",
     "nodemon": "^1.19.1",
     "superagent": "^5.1.0"
+  },
+  "devDependencies": {
+    "eslint": "^6.3.0"
   }
 }
