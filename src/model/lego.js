@@ -9,4 +9,6 @@ const brickSchema = mongoose.Schema({
   externalId: { type: String },
 });
 
+
+
 module.exports = mongoose.model('bricks', brickSchema);
