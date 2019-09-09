@@ -47,7 +47,7 @@ apiRouter.post('/article', auth('create'), (req, res, next) => {
       res.status(200);
       res.send(article);
     })
-    .catch(next)
-})
+    .catch(next);
+});
 
 module.exports = apiRouter;

@@ -15,15 +15,15 @@ const userSchema = mongoose.Schema({
   username: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   email: { type: String, required: true },
-  role: { type: String, required: true, default: 'user', enum: ['user', 'admin', 'editor', 'superuser'] }
+  role: { type: String, required: true, default: 'user', enum: ['user', 'admin', 'editor', 'superuser'] },
 }, {
-    toObject: {
-      virtuals: true
-    },
-    toJSON: {
-      virtuals: true
-    }
-  });
+  toObject: {
+    virtuals: true,
+  },
+  toJSON: {
+    virtuals: true,
+  },
+});
 
 userSchema.virtual('capabilities', {
   ref: 'roles',
@@ -33,7 +33,7 @@ userSchema.virtual('capabilities', {
 });
 
 userSchema.pre('findOne', async function () {
-  console.log('FIND PREHOOK RUN')
+  console.log('FIND PREHOOK RUN');
   try {
     this.populate('capabilities');
   }
@@ -106,7 +106,7 @@ userSchema.statics.authenticateBasic = function (auth) {
 userSchema.methods.comparePassword = function (password) {
   return bcrypt.compare(password, this.password)
     .then(valid => valid ? this : null);
-}
+};
 
 // refactoring generate token method to check for user capabilites and expiration variablw
 userSchema.methods.generateToken = function (type) {
@@ -117,18 +117,18 @@ userSchema.methods.generateToken = function (type) {
   };
   let options = {};
   if (type !== 'key' && !!TOKEN_EXPIRE) {
-    options = { expiresIn: TOKEN_EXPIRE }
+    options = { expiresIn: TOKEN_EXPIRE };
   }
   return jwt.sign(token, SECRET, options);
-}
+};
 
 // Method for checking a specify users access controls
 userSchema.methods.can = function (capability) {
-  return capabilities[this.role].includes(capability)
-}
+  return capabilities[this.role].includes(capability);
+};
 
 userSchema.methods.generateKey = function () {
   return this.generateToken('key');
-}
+};
 
 module.exports = mongoose.model('users', userSchema);
