@@ -16,7 +16,7 @@ apiRouter.post('/signup', (req, res, next) => {
       req.user = user;
       res.set('token', req.token);
       res.cookie('auth', req.token);
-      res.send(req.token);
+      res.redirect('/train');
     })
     .catch(next);
 });

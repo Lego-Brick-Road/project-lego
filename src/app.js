@@ -17,10 +17,21 @@ app.use(morgan('dev'));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(express.static('./public'));
+
+// ROUTES=========================
+
+app.use('/train', express.static('public/train'));
+app.use('/classify', express.static('public/classify'));
+
+app.get('/', (req, res, next) => {
+  res.send('./public');
+});
 
 app.use(routes);
 app.use(roleTestRoutes);
 
+//================================
 app.use('*', notFound);
 app.use(errorHandler);
 
