@@ -28,6 +28,7 @@
   },
   "devDependencies": {
     "eslint": "^6.3.0"
+  }
   },
   "directories": {
     "doc": "docs"
