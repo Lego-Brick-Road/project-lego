@@ -8,6 +8,7 @@ const errorHandler = require('./middleware/500.js');
 const notFound = require('./middleware/404.js');
 const routes = require('./router.js');
 const roleTestRoutes = require('./role-test-router.js');
+const webApiRoutes = require('./web-api-route');
 require('./helper/init-roles.js')();
 
 const app = express();
@@ -17,6 +18,9 @@ app.use(morgan('dev'));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// TODO: Temporary route to get brick data from Rebrickable API
+app.use(webApiRoutes);
 
 app.use(routes);
 app.use(roleTestRoutes);
