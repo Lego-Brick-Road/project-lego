@@ -7,7 +7,8 @@ const morgan = require('morgan');
 const errorHandler = require('./middleware/500.js');
 const notFound = require('./middleware/404.js');
 const routes = require('./router.js');
-const roleTestRoutes = require('./role-test-router.js');
+const roleTestRoutes = require('./brick-router.js');
+
 require('./helper/init-roles.js')();
 
 const app = express();
