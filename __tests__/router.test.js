@@ -27,7 +27,7 @@ beforeAll(async (done) => {
   const admin = await new Roles(roles.admin).save();
   const editor = await new Roles(roles.editor).save();
   const user = await new Roles(roles.user).save();
-  done()
+  done();
 });
 
 

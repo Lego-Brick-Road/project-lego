@@ -1,6 +1,6 @@
 'use strict';
 
-process.env.SECRET = "test";
+process.env.SECRET = 'test';
 
 const { startDB, stopDB } = require('cf-supergoose');
 const auth = require('../src/middleware/auth.js');
@@ -27,7 +27,7 @@ beforeAll(async (done) => {
   const adminRole = await new Roles(roles.admin).save();
   const editorRole = await new Roles(roles.editor).save();
   const userRole = await new Roles(roles.user).save();
-  done()
+  done();
 });
 
 afterAll(stopDB);
@@ -44,7 +44,7 @@ describe('Auth Middleware', () => {
   // editor:password: ZWRpdG9yOnBhc3N3b3Jk
   // user:password: dXNlcjpwYXNzd29yZA==
 
-  let errorMessage = "Invalid User ID / Password";
+  let errorMessage = 'Invalid User ID / Password';
 
   describe('user authentication', () => {
 
@@ -83,7 +83,7 @@ describe('Auth Middleware', () => {
       // the middleware doesn't return a promise but instead throws an
       // error in the main catch block, so this assertion validates that
       // behavior instead of a standard promise signature
-      middleware(req, res, next)
+      middleware(req, res, next);
       expect(next).toHaveBeenCalledWith(errorMessage);
 
     }); // it()
@@ -114,7 +114,7 @@ describe('Auth Middleware', () => {
 
       let req = {
         headers: {
-          authorization: `Bearer ${cachedToken}`
+          authorization: `Bearer ${cachedToken}`,
         },
       };
       let res = {};

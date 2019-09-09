@@ -1,6 +1,6 @@
 'use strict';
 
-const Roles = require('../model/role.js')
+const Roles = require('../model/role.js');
 
 let roles = {
   superuser: { role: 'superuser', capabilities: ['create', 'read', 'update', 'delete', 'superuser'] },
@@ -13,7 +13,7 @@ module.exports = () => {
 
   Object.keys(roles).forEach(async (userType) => {
     await new Roles(roles[userType]).save();
-  })
+  });
 
-}
+};
 
