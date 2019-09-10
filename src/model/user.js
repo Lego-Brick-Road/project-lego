@@ -16,7 +16,11 @@ const userSchema = mongoose.Schema({
   password: { type: String, required: true },
   email: { type: String, required: true },
   role: { type: String, required: true, default: 'user', enum: ['user', 'admin', 'editor', 'superuser'] },
+<<<<<<< HEAD
   bricks:{ type: Object, default: {}},
+=======
+  bricks: { type: Object , default: {}},
+>>>>>>> e17c4c769b79ee5f6c2092ab26af5ce09fabb1c3
 }, {
   toObject: {
     virtuals: true,
