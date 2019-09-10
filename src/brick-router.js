@@ -35,15 +35,6 @@ function findBrickDB(request, response, next){
     });
 }
 
-<<<<<<< HEAD
-
-
-function getBrick (request, response, next ) {
-  //Hanna- find lego brick by part number
-  return Brick.findOne({partNum: request.params.partNum})
-    .then( result => response.status(200).json(result))
-    .catch( error => next( error) );
-=======
 /**
  * Function to increment brick in user collection, or add new brick to user collection
  * @param request
@@ -71,7 +62,6 @@ function addBrickToUser (request, response, next){
       })
       .catch(console.log);
   }
->>>>>>> e17c4c769b79ee5f6c2092ab26af5ce09fabb1c3
 }
 
 function getExistingCollection(request, response, next){
