@@ -22,7 +22,6 @@ function getMyBricks(request, response, next ) {
   catch (error){
     console.log(error);
   }
-
 }
 
 module.exports = myBricksRoute;

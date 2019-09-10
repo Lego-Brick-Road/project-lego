@@ -9,8 +9,9 @@ const auth = require('./middleware/auth.js');
 const oauth = require('./oauth/google.js');
 const getFromApi = require('./web-api-route');
 
-apiRouter.get('/brick', auth(), findBrickDB );
+apiRouter.get('/brick', auth(), findBrickDB);
 apiRouter.post('/brick', auth(), addBrickToUser);
+apiRouter.get('/bricks', auth(), getUserBricks);
 apiRouter.put('/brick/:partNum', auth(), editBrick);
 apiRouter.delete('/brick/:partNum', auth(), deleteBrick);
 
@@ -73,54 +74,22 @@ function addBrickToUser (request, response, next){
   }
 }
 
-function getExistingCollection(request, response, next){
-  let bricks = request.user.bricks;
-  // let partNum = request.query.partNum;
-  let quantity = bricks[request.query.partNum] ? bricks[request.query.partNum] : 0;
-  console.log('QUANTITY', quantity);
-
-  Brick.findOne({partNum: request.query.partNum})
-    .then(result => {
-      if(result){
-        result.quantity = quantity;
-        response.send(result);
-      } else {
-        // console.log(request.params.partNum);
-        getFromApi(request.params.partNum)
-          .then(result => {
-            result.quantity = quantity;
-            response.send(result);
-          })
-          .catch(console.log);
-      }
-    });
+/**
+ * Function gets all bricks from a user
+ * @param request
+ * @param response
+ * @param next
+ */
+function getUserBricks (request, response, next ) {
+  let myBricks = request.user.bricks;
+  try {
+    response.send(myBricks);
+    response.status(200);
+  }
+  catch (error){
+    console.log(error);
+  }
 }
-
-// function getBrick (request, response, next ) {
-//   //Hanna- find lego brick by part number
-//   console.log(User.bricks);
-//   return User.bricks.findOne({partNum: request.params.partNum})
-//     .then( result => response.status(200).json(result))
-//     .catch( error => next( error) );
-// }
-// function getBrick (request, response, next ) {
-//   //Hanna- find lego brick by part number
-//   return Brick.findOne({partNum: request.params.partNum})
-//     .then( result => response.status(200).json(result))
-//     .catch( error => next( error) );
-// }
-
-// function createBrick( request, response, next) {
-//   let brick = new Brick(request.body);
-//   brick.save()
-//     .then(results => {
-//       console.log(User);
-//       User.bricks[request.body.partNum] = 1;
-//       return results;
-//     })
-//     .then(result => response.status(200).json(result) )
-//     .catch( error => next( error ));
-// }
 
 function editBrick ( request, response, next ) {
   //console.log(request.params.partNum);
