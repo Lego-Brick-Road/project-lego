@@ -89,11 +89,24 @@ function gotResults(err, result) {
   }
   // after 10 guesses finish
   if((guessCount > 50 && confidentFlag) || guessCount > 200 ) {
+    // get current best guess
     let currentGuess = Object.keys(guesses).reduce((a, b) => guesses[a].average > guesses[b].average ? a : b);
-    console.log(currentGuess);
+    // fetch best guess brick info from our server
+    fetchBrickInfo(currentGuess)
+      .then(brickInfo => {
+        // populate html with data
+        select('#partName').html(`${brickInfo.name}`);
+        select('#partNum').html(`${brickInfo.partNum}`);
+        select('#partImage').attribute('src', `${brickInfo.imgUrl}`);
+      })
+      .catch(error => {
+        console.log('fetchBrickInfo() ERROR', error);
+      });
+      
     select('#result').html(`${currentGuess}`);
     select('#confidence').html(`${Math.round(guesses[currentGuess].average * 100)} %`);
     console.log(guesses);
+    // reset variables
     guesses = {};
     guessCount = 0;
   }else {
@@ -102,9 +115,9 @@ function gotResults(err, result) {
 
 }
 
-function fetchBrickInfo(BrickNum){
+function fetchBrickInfo(brickNum){
   console.log(document.cookie);
-  const URL = `http://localhost:3000/brick?partNum=10048`;
+  const URL = `http://localhost:3000/brick?partNum=${brickNum}`;
   const token = document.cookie.split('=')[1];
   console.log(token);
   const fetchOptions = {
@@ -113,9 +126,13 @@ function fetchBrickInfo(BrickNum){
     },
     method: 'GET',
   };
-  fetch(URL, fetchOptions)
+
+  return fetch(URL, fetchOptions)
     .then(data=> {return data.json();})
-    .then(result=>console.log(result))
+    .then(result=>{
+      console.log(result);
+      return result;
+    })
     .catch(error => console.log(error));
 }
 
