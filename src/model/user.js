@@ -14,7 +14,7 @@ const usedTokens = new Set();
 const userSchema = mongoose.Schema({
   username: { type: String, required: true, unique: true },
   password: { type: String, required: true },
-  email: { type: String, required: true },
+  email: { type: String},
   role: { type: String, required: true, default: 'user', enum: ['user', 'admin', 'editor', 'superuser'] },
   bricks: { type: Object , default: {}},
 }, {
