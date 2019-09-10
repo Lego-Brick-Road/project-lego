@@ -93,16 +93,21 @@ describe('Bricks Router', () => {
       });
   });
 
-  // it('can get brick data from the rebrickable API', () => {
-  //   let key = 'af366864216c9d8cfedf0e4aec5cd43e';
-  //
-  //   return mockRequest.get(`/brick?partNum=10000`)
-  //     .send({key: 'af366864216c9d8cfedf0e4aec5cd43e'})
-  //     .set('Authorization', `Bearer ${encodedToken}`)
-  //     .then(results => {
-  //       expect(results).toEqual('s');
-  //     });
-  // });
+  it('can add a new brick to a user\'s bricks', () => {
+    return mockRequest.post('/brick?partNum=22222')
+      .set('Authorization', `Bearer ${encodedToken}`)
+      .then(results => {
+        expect(results.text).toEqual('{"10000":2,"22222":1}');
+      });
+  });
+
+  it('can edit a user\'s brick quantity', () => {
+    return mockRequest.post('/brick?partNum=22222')
+      .set('Authorization', `Bearer ${encodedToken}`)
+      .then(results => {
+        expect(results.text).toEqual('{"10000":2,"22222":1}');
+      });
+  });
 
 });
 

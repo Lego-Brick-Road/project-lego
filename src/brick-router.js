@@ -3,10 +3,8 @@
 const express = require('express');
 const apiRouter = express.Router();
 
-const User = require('./model/user');
 const Brick = require('./model/lego');
 const auth = require('./middleware/auth.js');
-const oauth = require('./oauth/google.js');
 const getFromApi = require('./web-api-route');
 
 apiRouter.get('/brick', auth(), findBrickDB);
@@ -92,7 +90,6 @@ function getUserBricks (request, response, next ) {
 }
 
 function editBrick ( request, response, next ) {
-  //console.log(request.params.partNum);
   return Brick.update( {partNum: request.params.partNum} , request.body)
     .then( result => response.status(200).json(result))
     .catch( error => next(error) );
