@@ -16,6 +16,7 @@ const userSchema = mongoose.Schema({
   password: { type: String, required: true },
   email: { type: String},
   role: { type: String, required: true, default: 'user', enum: ['user', 'admin', 'editor', 'superuser'] },
+  bricks: { type: Object , default: {}},
 }, {
   toObject: {
     virtuals: true,
