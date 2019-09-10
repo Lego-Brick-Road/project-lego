@@ -11,6 +11,9 @@ let video;
 // Create a KNN classifier
 const knnClassifier = ml5.KNNClassifier();
 let featureExtractor;
+let brickIdInput;
+let guesses = {};
+let guessCount = 0;
 
 function setup() {
   // Create a featureExtractor that can extract the already learned features from MobileNet
@@ -39,7 +42,6 @@ function addExample(label) {
 
   // Add an example with a label to the classifier
   knnClassifier.addExample(features, label);
-  updateCounts();
 }
 
 // Predict the current frame.
@@ -67,50 +69,12 @@ function classify() {
 
 // A util function to create UI buttons
 function createButtons() {
-  // When the A button is pressed, add the current frame
-  // from the video with a label of "rock" to the classifier
-  buttonA = select('#addClassRock');
-  buttonA.mousePressed(function() {
-    addExample('Rock');
-  });
 
-  // When the B button is pressed, add the current frame
-  // from the video with a label of "paper" to the classifier
-  buttonB = select('#addClassPaper');
-  buttonB.mousePressed(function() {
-    addExample('Paper');
-  });
-
-  // When the C button is pressed, add the current frame
-  // from the video with a label of "scissor" to the classifier
-  buttonC = select('#addClassScissor');
-  buttonC.mousePressed(function() {
-    addExample('Scissor');
-  });
-
-  // Reset buttons
-  resetBtnA = select('#resetRock');
-  resetBtnA.mousePressed(function() {
-    clearLabel('Rock');
-  });
-	
-  resetBtnB = select('#resetPaper');
-  resetBtnB.mousePressed(function() {
-    clearLabel('Paper');
-  });
-	
-  resetBtnC = select('#resetScissor');
-  resetBtnC.mousePressed(function() {
-    clearLabel('Scissor');
-  });
+  brickIdInput = select('#brickID');
 
   // Predict button
   buttonPredict = select('#buttonPredict');
   buttonPredict.mousePressed(classify);
-
-  // Clear all classes button
-  buttonClearAll = select('#clearAll');
-  buttonClearAll.mousePressed(clearAllLabels);
 
   // Load saved classifier dataset
   buttonSetData = select('#load');
@@ -123,6 +87,8 @@ function createButtons() {
 
 // Show the results
 function gotResults(err, result) {
+  let confidentFlag = false;
+
   // Display any error
   if (err) {
     console.error(err);
@@ -130,27 +96,38 @@ function gotResults(err, result) {
 
   if (result.confidencesByLabel) {
     const confidences = result.confidencesByLabel;
-    // result.label is the label that has the highest confidence
-    if (result.label) {
-      select('#result').html(result.label);
-      select('#confidence').html(`${confidences[result.label] * 100} %`);
-    }
+    guessCount ++;
 
-    select('#confidenceRock').html(`${confidences['Rock'] ? confidences['Rock'] * 100 : 0} %`);
-    select('#confidencePaper').html(`${confidences['Paper'] ? confidences['Paper'] * 100 : 0} %`);
-    select('#confidenceScissor').html(`${confidences['Scissor'] ? confidences['Scissor'] * 100 : 0} %`);
+    // add new ML confidences to our guesses object
+    Object.keys(confidences).forEach(label => {
+      if(guesses[label]) {
+        guesses[label].total = guesses[label].total + confidences[label];
+      } else {
+        guesses[label] = {total: confidences[label]};
+      }
+    });
+
+    // compute new average for every guess
+    Object.keys(guesses).forEach(label => {
+      guesses[label].average = guesses[label].total / guessCount;
+      if (guesses[label].average > 0.80) {confidentFlag = true;}
+    });
+
+  }
+  // after 10 guesses finish
+  if(guessCount > 50 && confidentFlag){
+    console.log(guesses);
+    guesses = {};
+    guessCount = 0;
+  }else {
+    classify();
   }
 
-  classify();
 }
 
 // Update the example count for each label	
-function updateCounts() {
-  const counts = knnClassifier.getCountByLabel();
-
-  select('#exampleRock').html(counts['Rock'] || 0);
-  select('#examplePaper').html(counts['Paper'] || 0);
-  select('#exampleScissor').html(counts['Scissor'] || 0);
+function logExampleCounts() {
+  console.log(knnClassifier.getCountByLabel());
 }
 
 // Clear the examples in one label
@@ -159,11 +136,6 @@ function clearLabel(label) {
   updateCounts();
 }
 
-// Clear all the examples in all labels
-function clearAllLabels() {
-  knnClassifier.clearAllLabels();
-  updateCounts();
-}
 
 // Save dataset as myKNNDataset.json
 function saveMyKNN() {
@@ -173,4 +145,23 @@ function saveMyKNN() {
 // Load dataset to the classifier
 function loadMyKNN() {
   knnClassifier.load('./myKNNDataset.json', updateCounts);
+}
+
+// runs whenever a key is pressed
+function keyPressed() {
+  if(keyCode === 189) {
+    console.log(`clear label: ${brickIdInput.elt.value}`);
+    clearLabel(brickIdInput.elt.value);
+  }
+  // return false; // prevent any default behaviour
+}
+
+
+function draw(){
+  // check if '=' key is pressed and train add the current frame
+  // from the video with a label from brickIdInput to the classifier
+  if(keyIsDown(187)){
+    console.log(`training label: ${brickIdInput.elt.value}`);
+    addExample(brickIdInput.elt.value);
+  }
 }
