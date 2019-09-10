@@ -11,6 +11,7 @@ const routes = require('./router.js');
 const webApiRoutes = require('./web-api-route');
 
 const roleTestRoutes = require('./brick-router.js');
+const myBricksRoute = require('./myBricks');
 
 
 require('./helper/init-roles.js')();
@@ -28,7 +29,7 @@ app.use(webApiRoutes);
 
 app.use(routes);
 app.use(roleTestRoutes);
-
+app.use(myBricksRoute);
 app.use('*', notFound);
 app.use(errorHandler);
 

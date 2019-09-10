@@ -13,6 +13,8 @@ apiRouter.put('/brick/:partNum', editBrick);
 apiRouter.delete('/brick/:partNum', deleteBrick);
 
 
+
+
 function getBrick (request, response, next ) {
   //Hanna- find lego brick by part number
   return Brick.findOne({partNum: request.params.partNum})
