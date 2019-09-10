@@ -10,6 +10,7 @@ const routes = require('./router.js');
 
 // const webApiRoutes = require('./web-api-route');
 
+const myBricksRoute = require('./myBricks');
 const brickRouter = require('./brick-router.js');
 
 
@@ -27,6 +28,7 @@ app.use(express.urlencoded({ extended: true }));
 // app.use(webApiRoutes);
 
 app.use(routes);
+app.use(myBricksRoute);
 app.use(brickRouter);
 
 app.use('*', notFound);
