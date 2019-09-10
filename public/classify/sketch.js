@@ -7,6 +7,9 @@
 ml5 Example
 KNN Classification on Webcam Images with mobileNet. Built with p5.js
 === */
+
+/* eslint no-undef: 0 */
+
 let video;
 // Create a KNN classifier
 const knnClassifier = ml5.KNNClassifier();
@@ -28,11 +31,11 @@ function setup() {
 }
 
 function modelReady(){
-  select('#ModelStatus').html('FeatureExtractor(mobileNet model) Loaded')
+  select('#ModelStatus').html('FeatureExtractor(mobileNet model) Loaded');
 
   // load our classifier
   knnClassifier.load('./myKNNDataset.json', () => {
-    select('#ClassifierStatus').html('Brick Lego Classifer Loaded')
+    select('#ClassifierStatus').html('Brick Lego Classifer Loaded');
   });
 }
 
@@ -92,7 +95,7 @@ function gotResults(err, result) {
 }
 // run classify function when spacebar is pressed
 function keyPressed() {
-  console.log('started classifying')
+  console.log('started classifying');
   if(keyCode === 32) {
     classify();
   }
