@@ -114,7 +114,9 @@ function gotResults(err, result) {
     // compute new average for every guess
     Object.keys(guesses).forEach(label => {
       guesses[label].average = guesses[label].total / guessCount;
-      if (guesses[label].average > 0.80) {confidentFlag = true;}
+      if (guesses[label].average > 0.80) {
+        confidentFlag = true;
+      }
     });
 
   }

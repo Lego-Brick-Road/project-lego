@@ -114,7 +114,7 @@ function fetchBrickInfo(BrickNum){
     method: 'GET',
   };
   fetch(URL, fetchOptions)
-    .then(data=> {return data.json()})
+    .then(data=> {return data.json();})
     .then(result=>console.log(result))
     .catch(error => console.log(error));
 }
