@@ -19,7 +19,7 @@ function getMyBricks(request, response, next ) {
     response.send(myBricks);
     response.status(200);
   }
-  catch {
+  catch (error){
     console.log(error);
   }
 
