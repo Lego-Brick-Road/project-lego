@@ -16,12 +16,13 @@ apiRouter.put('/brick/:partNum', auth(), editBrick);
 apiRouter.delete('/brick/:partNum', auth(), deleteBrick);
 
 /**
- * Function checks our bricks DB to see if we already have the brick info
+ * Function checks our bricks DB to see if we already have the brick info else get from Rebrickable API
  * @param request -> part number
  * @param response -> {*}
  * @param next
  */
 function findBrickDB(request, response, next){
+  console.log('HIT THE GET BRICK ROUTE');
   Brick.findOne({partNum: request.query.partNum})
     .then(result => {
       if(result){

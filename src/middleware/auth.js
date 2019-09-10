@@ -33,7 +33,7 @@ module.exports = capability => {
     function _authBearer(authString) {
       return User.authenticateToken(authString)
         .then(user => _authenticate(user))
-        .catch(_authError);
+        .catch('_authBearer ERROR:',_authError);
     }
 
     function _authenticate(user) {

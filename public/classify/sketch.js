@@ -28,6 +28,10 @@ function setup() {
   video = createCapture(VIDEO);
   // Append it to the videoContainer DOM element
   video.parent('videoContainer');
+
+  // Add brick to collection button
+  buttonPredict = select('#addBrick');
+  // buttonPredict.mousePressed(classify);
 }
 
 function modelReady(){
@@ -85,10 +89,24 @@ function gotResults(err, result) {
   }
   // after 10 guesses finish
   if((guessCount > 50 && confidentFlag) || guessCount > 200 ) {
-    console.log(getGreatestGuess());
-    // select('#result').html('FeatureExtractor(mobileNet model) Loaded');
-    // select('#confidence').html('FeatureExtractor(mobileNet model) Loaded');
+    // get current best guess
+    let currentGuess = Object.keys(guesses).reduce((a, b) => guesses[a].average > guesses[b].average ? a : b);
+    // fetch best guess brick info from our server
+    fetchBrickInfo(currentGuess)
+      .then(brickInfo => {
+        // populate html with data
+        select('#partName').html(`${brickInfo.name}`);
+        select('#partNum').html(`${brickInfo.partNum}`);
+        select('#partImage').attribute('src', `${brickInfo.imgUrl}`);
+      })
+      .catch(error => {
+        console.log('fetchBrickInfo() ERROR', error);
+      });
+      
+    select('#result').html(`${currentGuess}`);
+    select('#confidence').html(`${Math.round(guesses[currentGuess].average * 100)} %`);
     console.log(guesses);
+    // reset variables
     guesses = {};
     guessCount = 0;
   }else {
@@ -97,9 +115,27 @@ function gotResults(err, result) {
 
 }
 
-function getGreatestGuess(){
-  return Object.keys(guesses).reduce((a, b) => obj[a].average > obj[b].average ? a : b);
+function fetchBrickInfo(brickNum){
+  console.log(document.cookie);
+  const URL = `http://localhost:3000/brick?partNum=${brickNum}`;
+  const token = document.cookie.split('=')[1];
+  console.log(token);
+  const fetchOptions = {
+    headers:{
+      'Authorization': `Bearer ${token}`,
+    },
+    method: 'GET',
+  };
+
+  return fetch(URL, fetchOptions)
+    .then(data=> {return data.json();})
+    .then(result=>{
+      console.log(result);
+      return result;
+    })
+    .catch(error => console.log(error));
 }
+
 // run classify function when spacebar is pressed
 function keyPressed() {
   if(keyCode === 32) {
@@ -108,3 +144,5 @@ function keyPressed() {
   }
   return false; // if you want to prevent any default behaviour
 }
+
+fetchBrickInfo(6060);
