@@ -31,7 +31,6 @@ app.use(routes);
 app.use(myBricksRoute);
 app.use(brickRouter);
 
->>>>>>> e17c4c769b79ee5f6c2092ab26af5ce09fabb1c3
 app.use('*', notFound);
 app.use(errorHandler);
 
