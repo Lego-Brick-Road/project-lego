@@ -85,6 +85,9 @@ function gotResults(err, result) {
   }
   // after 10 guesses finish
   if((guessCount > 50 && confidentFlag) || guessCount > 200 ) {
+    console.log(getGreatestGuess());
+    // select('#result').html('FeatureExtractor(mobileNet model) Loaded');
+    // select('#confidence').html('FeatureExtractor(mobileNet model) Loaded');
     console.log(guesses);
     guesses = {};
     guessCount = 0;
@@ -93,10 +96,14 @@ function gotResults(err, result) {
   }
 
 }
+
+function getGreatestGuess(){
+  return Object.keys(guesses).reduce((a, b) => obj[a].average > obj[b].average ? a : b);
+}
 // run classify function when spacebar is pressed
 function keyPressed() {
-  console.log('started classifying');
   if(keyCode === 32) {
+    console.log('started classifying');
     classify();
   }
   return false; // if you want to prevent any default behaviour
