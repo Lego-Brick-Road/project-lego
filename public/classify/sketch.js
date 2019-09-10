@@ -85,9 +85,10 @@ function gotResults(err, result) {
   }
   // after 10 guesses finish
   if((guessCount > 50 && confidentFlag) || guessCount > 200 ) {
-    console.log(getGreatestGuess());
-    // select('#result').html('FeatureExtractor(mobileNet model) Loaded');
-    // select('#confidence').html('FeatureExtractor(mobileNet model) Loaded');
+    let currentGuess = Object.keys(guesses).reduce((a, b) => guesses[a].average > guesses[b].average ? a : b);
+    console.log(currentGuess);
+    select('#result').html(`${currentGuess}`);
+    select('#confidence').html(`${Math.round(guesses[currentGuess].average * 100)} %`);
     console.log(guesses);
     guesses = {};
     guessCount = 0;
