@@ -10,12 +10,8 @@ const routes = require('./router.js');
 
 // const webApiRoutes = require('./web-api-route');
 
-<<<<<<< HEAD
-const roleTestRoutes = require('./brick-router.js');
 const myBricksRoute = require('./myBricks');
-=======
 const brickRouter = require('./brick-router.js');
->>>>>>> e17c4c769b79ee5f6c2092ab26af5ce09fabb1c3
 
 
 require('./helper/init-roles.js')();
@@ -32,10 +28,7 @@ app.use(express.urlencoded({ extended: true }));
 // app.use(webApiRoutes);
 
 app.use(routes);
-<<<<<<< HEAD
-app.use(roleTestRoutes);
 app.use(myBricksRoute);
-=======
 app.use(brickRouter);
 
 >>>>>>> e17c4c769b79ee5f6c2092ab26af5ce09fabb1c3
