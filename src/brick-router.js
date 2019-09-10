@@ -28,6 +28,15 @@ function findBrickDB(request, response, next){
       } else {
         getFromApi(request.query.partNum)
           .then(result => {
+            let newBrick = new Brick(result);
+            newBrick.name = result.name;
+            newBrick.partNum = result.part_num;
+            newBrick.imgUrl = result.part_img_url;
+            newBrick.externalId = result.external_ids;
+            newBrick.save();
+            return newBrick;
+          })
+          .then(result => {
             response.send(result);
           })
           .catch(console.log);
