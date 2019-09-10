@@ -28,6 +28,10 @@ function setup() {
   video = createCapture(VIDEO);
   // Append it to the videoContainer DOM element
   video.parent('videoContainer');
+
+  // Add brick to collection button
+  buttonPredict = select('#addBrick');
+  // buttonPredict.mousePressed(classify);
 }
 
 function modelReady(){
@@ -98,9 +102,23 @@ function gotResults(err, result) {
 
 }
 
-function getGreatestGuess(){
-  return Object.keys(guesses).reduce((a, b) => obj[a].average > obj[b].average ? a : b);
+function fetchBrickInfo(BrickNum){
+  console.log(document.cookie);
+  const URL = `http://localhost:3000/brick?partNum=10048`;
+  const token = document.cookie.split('=')[1];
+  console.log(token);
+  const fetchOptions = {
+    headers:{
+      'Authorization': `Bearer ${token}`,
+    },
+    method: 'GET',
+  };
+  fetch(URL, fetchOptions)
+    .then(data=> {return data.json()})
+    .then(result=>console.log(result))
+    .catch(error => console.log(error));
 }
+
 // run classify function when spacebar is pressed
 function keyPressed() {
   if(keyCode === 32) {
@@ -109,3 +127,5 @@ function keyPressed() {
   }
   return false; // if you want to prevent any default behaviour
 }
+
+fetchBrickInfo(6060);
