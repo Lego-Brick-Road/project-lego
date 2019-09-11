@@ -37,6 +37,10 @@ function setup() {
   // delete brick from collection button
   deleteBrickButton = select('#deleteBrick');
   deleteBrickButton.mousePressed(deleteBrick);
+
+  // set nav link for collection
+  select('#collectionNav').attribute('href', `${window.location.origin}/bricks`);
+
 }
 
 // HELPER FUNCTIONS ===========================
@@ -58,7 +62,7 @@ function fetchOptions(fetchMethod) { // fetchMethod = 'POST' || 'DELETE' || 'GET
 function getBrick(){
   const URL = `${window.location.origin}/brick?partNum=${currentGuess}`;
 
-  return fetch(URL, fetchOptions('GET'))
+  return fetch(URL)
     .then(data=> {return data.json();})
     .then(result=>{
       console.log(result);
@@ -117,7 +121,7 @@ function classify() {
   knnClassifier.classify(features, gotResults);
 }
 
-// store results in guesses object until confidence threshold is met
+
 function gotResults(err, result) {
   let confidentFlag = false;
 
