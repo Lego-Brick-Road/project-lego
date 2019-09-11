@@ -6,6 +6,7 @@ const apiRouter = express.Router();
 const User = require('./model/user.js');
 const auth = require('./middleware/auth.js');
 const oauth = require('./oauth/google.js');
+const getCookie = require('./middleware/cookies');
 
 apiRouter.post('/signup', (req, res, next) => {
   let user = new User(req.body);
@@ -27,18 +28,7 @@ apiRouter.post('/signin', getCookie, auth(), (req, res, next) => {
   res.redirect('/classify');
 });
 
-// Gets cookie for auth
-function getCookie(req, res, next){
-  try {
-    let [auth, cookieString] = req.headers.cookie.split('=');
-    // console.log(cookieString);
-    let newToken = 'bearer ' + cookieString;
-    req.headers.authorization = newToken;
-    next();
-  } catch (error){
-    console.log(error);
-  }
-}
+
 
 apiRouter.get('/oauth', (req, res, next) => {
   oauth.authorize(req)

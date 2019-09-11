@@ -41,6 +41,9 @@ app.get('/', (req, res, next) => {
 app.use(routes);
 app.use(brickRouter);
 
+//Setting ejs as view engine
+app.set('view engine', 'ejs');
+
 //================================
 app.use('*', notFound);
 app.use(errorHandler);
