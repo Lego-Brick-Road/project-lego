@@ -9,6 +9,4 @@ const brickSchema = mongoose.Schema({
   externalId: { type: Object },
 });
 
-
-
 module.exports = mongoose.model('bricks', brickSchema);

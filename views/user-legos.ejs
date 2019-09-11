@@ -8,10 +8,13 @@
 </head>
 
 <body>
-    <header>
-        <a href="../public/classify/index.html">classify</a>
-    </header>
-
+    <nav>
+        <ul>
+            <li><a href='./index.html'>Sign Out</a></li>
+            <li><a href='./classify/index.html'>Classify</a></li>
+            <li><a id='collectionNav' href=''>Collection</a></li>
+        </ul>
+    </nav>
     <main>
         <h2>My Lego Collection</h2>
         <div id = 'collection'>
@@ -23,6 +26,7 @@
             <p>Part Number: <%=lego.partNum %></p>
 
             <p>Quantity: <%=lego.quantity %></p>
+
           </div>
 
          <% }) %>
