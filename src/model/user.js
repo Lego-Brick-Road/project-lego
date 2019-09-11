@@ -6,7 +6,7 @@ const jwt = require('jsonwebtoken');
 const Role = require('./role.js');
 
 const SINGLE_USE_TOKENS = !!process.env.SINGLE_USE_TOKENS;
-const TOKEN_EXPIRE = process.env.TOKEN_LIFETIME || '5m';
+const TOKEN_EXPIRE = process.env.TOKEN_LIFETIME || '120m';
 const SECRET = process.env.SECRET || 'removethis';
 
 const usedTokens = new Set();
@@ -108,14 +108,16 @@ userSchema.methods.comparePassword = function (password) {
     .then(valid => valid ? this : null);
 };
 
-// refactoring generate token method to check for user capabilites and expiration variablw
+// refactoring generate token method to check for user capabilites and expiration variable
 userSchema.methods.generateToken = function (type) {
   let token = {
     id: this._id,
     capabilities: capabilities[this.role],
     type: type || 'user',
   };
+
   let options = {};
+
   if (type !== 'key' && !!TOKEN_EXPIRE) {
     options = { expiresIn: TOKEN_EXPIRE };
   }
