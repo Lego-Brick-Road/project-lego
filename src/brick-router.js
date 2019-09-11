@@ -82,23 +82,53 @@ function addBrickToUser (request, response, next){
 function getUserBricks (request, response, next ) {
   let myBricks = request.user.bricks;
   try {
-    let brickArray = [];
-
-    Object.keys(myBricks).forEach( partNum => {
-      Brick.findOne({ partNum })
-        .then( result => brickArray.push(result))
-        .catch( console.log);
-    });
-
-    response.render('user-legos', { lego : brickArray});
-
-    response.send(myBricks);
-    response.status(200);
+    makeBrickDataArray(myBricks)
+      .then(brickArray => {
+        response.render('user-legos', { lego : brickArray});
+      });
   }
   catch (error){
     console.log(error);
   }
 }
+
+async function makeBrickDataArray(myBricks){
+  let brickArray = [];
+  let keys = Object.keys(myBricks);
+  let brickQuantity = Object.values(myBricks);
+
+  for(let i = 0; i < keys.length; i++){
+    let results = await getBrickDataFromDB(keys[i]);
+    results.quantity = brickQuantity[i];
+    brickArray.push(results);
+  }
+  console.log('BRICK ARRAY', brickArray);
+  return brickArray;
+}
+
+function getBrickDataFromDB(partNum){
+  return Brick.findOne({ partNum })
+    .then( result => {
+      console.log('GET BRICK DATA DB- RESULT', result);
+      return result;
+    })
+    .catch( console.log);
+}
+
+
+// Object.keys(myBricks).forEach( partNum => {
+//   console.log('PART NUM', partNum);
+//   Brick.findOne({ partNum })
+//     .then( result => {
+//       console.log('RESULT', result);
+//       brickArray.push(result);
+//     })
+//     .then(() => {
+//       console.log('BRICK ARRAY', brickArray);
+//       response.render('user-legos', { lego : brickArray});
+//     })
+//     .catch( console.log);
+// });
 
 function editBrick ( request, response, next ) {
   return Brick.update( {partNum: request.params.partNum} , request.body)
@@ -107,10 +137,20 @@ function editBrick ( request, response, next ) {
 }
 
 function deleteBrick ( request, response, next ) {
-  console.log('DELETE ROUTE HIT');
-  return Brick.remove( {partNum: request.params.partNum})
-    .then( result => response.status(200).json(result))
-    .catch(error => next(error));
+  let partNum = request.params.partNum;
+  let tempBricks = request.user.bricks;
+
+  console.log(partNum, tempBricks[partNum]);
+  delete tempBricks[partNum];
+  console.log(partNum, tempBricks[partNum]);
+
+  request.user.update({bricks: tempBricks})
+    .then(() => {
+      response.send(request.user.bricks);
+    })
+    .catch(console.log);
+  
 }
 
 module.exports = apiRouter;
+
