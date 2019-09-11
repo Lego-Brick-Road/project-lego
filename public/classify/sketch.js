@@ -117,7 +117,7 @@ function gotResults(err, result) {
 
 function fetchBrickInfo(brickNum){
   console.log(document.cookie);
-  const URL = `http://localhost:3000/brick?partNum=${brickNum}`;
+  const URL = `${window.location.origin}/brick?partNum=${brickNum}`;
   const token = document.cookie.split('=')[1];
   console.log(token);
   const fetchOptions = {
