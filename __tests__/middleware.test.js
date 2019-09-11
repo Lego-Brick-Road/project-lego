@@ -168,6 +168,6 @@ describe('Auth Middleware', () => {
 
     }); // it()
 
-  }); // describe()
+  });
 
 });

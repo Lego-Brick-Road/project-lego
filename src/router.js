@@ -15,15 +15,30 @@ apiRouter.post('/signup', (req, res, next) => {
       req.user = user;
       res.set('token', req.token);
       res.cookie('auth', req.token);
-      res.send(req.token);
+      // res.send(req.token);
+      res.redirect('/train');
     })
     .catch(next);
 });
 
-apiRouter.post('/signin', auth(), (req, res, next) => {
+apiRouter.post('/signin', getCookie, auth(), (req, res, next) => {
   res.cookie('auth', req.token);
-  res.send(req.token);
+  // res.send(req.token);
+  res.redirect('/train');
 });
+
+// Gets cookie for auth
+function getCookie(req, res, next){
+  try {
+    let [auth, cookieString] = req.headers.cookie.split('=');
+    // console.log(cookieString);
+    let newToken = 'bearer ' + cookieString;
+    req.headers.authorization = newToken;
+    next();
+  } catch (error){
+    console.log(error);
+  }
+}
 
 apiRouter.get('/oauth', (req, res, next) => {
   oauth.authorize(req)
