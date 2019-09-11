@@ -18,6 +18,7 @@
     "cf-supergoose": "^1.0.2",
     "cors": "^2.8.5",
     "dotenv": "^8.1.0",
+    "ejs": "^2.6.1",
     "express": "^4.17.1",
     "jest": "^24.9.0",
     "jsonwebtoken": "^8.5.1",

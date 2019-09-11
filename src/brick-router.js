@@ -6,12 +6,13 @@ const apiRouter = express.Router();
 const Brick = require('./model/lego');
 const auth = require('./middleware/auth.js');
 const getFromApi = require('./web-api-route');
+const getCookie = require('./middleware/cookies');
 
-apiRouter.get('/brick', auth(), findBrickDB);
-apiRouter.post('/brick', auth(), addBrickToUser);
-apiRouter.get('/bricks', auth(), getUserBricks);
-apiRouter.put('/brick/:partNum', auth(), editBrick);
-apiRouter.delete('/brick/:partNum', auth(), deleteBrick);
+apiRouter.get('/brick', getCookie, auth(), findBrickDB);
+apiRouter.post('/brick',getCookie, auth(), addBrickToUser);
+apiRouter.get('/bricks', getCookie, auth(), getUserBricks);
+apiRouter.put('/brick/:partNum', getCookie, auth(), editBrick);
+apiRouter.delete('/brick/:partNum', getCookie, auth(), deleteBrick);
 
 /**
  * Function checks our bricks DB to see if we already have the brick info else get from Rebrickable API
@@ -73,7 +74,7 @@ function addBrickToUser (request, response, next){
 }
 
 /**
- * Function gets all bricks from a user
+ * Function gets all bricks from a user and displays on the user collection page using ejs
  * @param request
  * @param response
  * @param next
@@ -81,6 +82,16 @@ function addBrickToUser (request, response, next){
 function getUserBricks (request, response, next ) {
   let myBricks = request.user.bricks;
   try {
+    let brickArray = [];
+
+    Object.keys(myBricks).forEach( partNum => {
+      Brick.findOne({ partNum })
+        .then( result => brickArray.push(result))
+        .catch( console.log);
+    });
+
+    response.render('user-legos', { lego : brickArray});
+
     response.send(myBricks);
     response.status(200);
   }
