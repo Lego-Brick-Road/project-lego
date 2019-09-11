@@ -67,21 +67,6 @@ userSchema.pre('save', async function () {
   }
 });
 
-userSchema.statics.createFromOauth = function (email) {
-  if (!email) { return Promise.reject('Validation Error'); }
-
-  return this.findOne({ email })
-    .then(user => {
-      if (!user) { throw new Error('User Not Found'); }
-      return user;
-    })
-    .catch(error => {
-      let username = email;
-      let password = 'none';
-      return this.create({ username, password, email });
-    });
-};
-
 userSchema.statics.authenticateToken = function (token) {
   if (usedTokens.has(token)) {
     return Promise.reject('Invalid Token');

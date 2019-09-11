@@ -8,9 +8,9 @@ const auth = require('./middleware/auth.js');
 const getFromApi = require('./web-api-route');
 const getCookie = require('./middleware/cookies');
 
-apiRouter.get('/brick', getCookie, auth(), findBrickDB);
-apiRouter.post('/brick',getCookie, auth(), addBrickToUser);
 apiRouter.get('/bricks', getCookie, auth(), getUserBricks);
+apiRouter.get('/brick/:partNum', getCookie, auth(), findBrickDB);
+apiRouter.post('/brick/:partNum',getCookie, auth(), addBrickToUser);
 apiRouter.put('/brick/:partNum', getCookie, auth(), editBrick);
 apiRouter.delete('/brick/:partNum', getCookie, auth(), deleteBrick);
 
@@ -21,12 +21,12 @@ apiRouter.delete('/brick/:partNum', getCookie, auth(), deleteBrick);
  * @param next
  */
 function findBrickDB(request, response, next){
-  Brick.findOne({partNum: request.query.partNum})
+  Brick.findOne({partNum: request.params.partNum})
     .then(result => {
       if(result){
         response.send(result);
       } else {
-        getFromApi(request.query.partNum)
+        getFromApi(request.params.partNum)
           .then(result => {
             let newBrick = new Brick(result);
             newBrick.name = result.name;
@@ -51,7 +51,7 @@ function findBrickDB(request, response, next){
  * @param next
  */
 function addBrickToUser (request, response, next){
-  let partNum = request.query.partNum;
+  let partNum = request.params.partNum;
   let tempBricks = request.user.bricks;
 
   if(request.user.bricks[partNum]){

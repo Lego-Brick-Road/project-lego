@@ -5,7 +5,6 @@ const apiRouter = express.Router();
 
 const User = require('./model/user.js');
 const auth = require('./middleware/auth.js');
-const oauth = require('./oauth/google.js');
 const getCookie = require('./middleware/cookies');
 
 apiRouter.post('/signup', (req, res, next) => {
@@ -26,16 +25,6 @@ apiRouter.post('/signin', getCookie, auth(), (req, res, next) => {
   res.cookie('auth', req.token);
   // res.send(req.token);
   res.redirect('/classify');
-});
-
-
-
-apiRouter.get('/oauth', (req, res, next) => {
-  oauth.authorize(req)
-    .then(token => {
-      res.status(200).send(token);
-    })
-    .catch(next);
 });
 
 // generates a key for indefinite use.
