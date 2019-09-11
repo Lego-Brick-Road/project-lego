@@ -4,6 +4,7 @@ const User = require('../model/user.js');
 
 module.exports = capability => {
   return (req, res, next) => {
+
     try {
       let [authType, authString] = req.headers.authorization.split(/\s+/);
 
