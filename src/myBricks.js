@@ -6,7 +6,6 @@ const myBricksRoute = express.Router();
 
 const Brick = require('./model/lego');
 const auth = require('./middleware/auth.js');
-const oauth = require('./oauth/google.js');
 
 
 myBricksRoute.get('/myBricks', auth() , getMyBricks);
