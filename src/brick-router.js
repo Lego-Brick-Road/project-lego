@@ -41,7 +41,8 @@ function findBrickDB(request, response, next){
           })
           .catch(console.log);
       }
-    });
+    })
+    .catch(console.log);
 }
 
 /**
