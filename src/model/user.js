@@ -63,7 +63,7 @@ userSchema.pre('save', async function () {
       await userRole.save();
     }
   } catch (err) {
-    console.Error(`ERROR ${err}`);
+    console.error(`ERROR ${err}`);
   }
 });
 
@@ -93,7 +93,7 @@ userSchema.methods.comparePassword = function (password) {
     .then(valid => valid ? this : null);
 };
 
-// refactoring generate token method to check for user capabilites and expiration variable
+// refactoring generate token method to check for user capabilities and expiration variable
 userSchema.methods.generateToken = function (type) {
   let token = {
     id: this._id,
