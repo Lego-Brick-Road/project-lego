@@ -60,7 +60,7 @@ function fetchOptions(fetchMethod) { // fetchMethod = 'POST' || 'DELETE' || 'GET
 // API CALLS ===========================
 
 function getBrick(){
-  const URL = `${window.location.origin}/brick?partNum=${currentGuess}`;
+  const URL = `${window.location.origin}/brick/${currentGuess}`;
 
   return fetch(URL)
     .then(data=> {return data.json();})
@@ -72,7 +72,7 @@ function getBrick(){
 }
 
 function addBrick() {
-  const URL = `${window.location.origin}/brick?partNum=${currentGuess}`;
+  const URL = `${window.location.origin}/brick/${currentGuess}`;
 
   return fetch(URL, fetchOptions('POST'))
     .then(data=> {return data.json();})

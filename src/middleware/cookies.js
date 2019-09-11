@@ -2,15 +2,13 @@
 
 // Gets cookie for auth
 function getCookie(req, res, next){
-  try {
+  if(req.headers.cookie){
     let [auth, cookieString] = req.headers.cookie.split('=');
     // console.log(cookieString);
     let newToken = 'bearer ' + cookieString;
     req.headers.authorization = newToken;
-    next();
-  } catch (error){
-    console.log(error);
   }
+  next();
 }
 
 module.exports = getCookie;
