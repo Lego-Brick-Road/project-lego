@@ -1,0 +1,101 @@
+
+
+body {
+    font-family: "trebuchet ms";
+    background: #1abc9c;
+    background-attachment: fixed;
+  }
+  
+  h1 {
+    font-family: 'Dosis', "merienda-one";
+    text-align: center;
+    font-size: 3em;
+    color: #fff;
+    font-weight: 100;
+    text-shadow: 2px 2px #000000;
+  }
+  
+  .row {
+    background: url('../assets/legowallpaper4.jpg');
+    /* background-repeat: no-repeat; */
+    background-size: 130% 100%;
+    width: 420px;
+    height: 450px;
+    padding: 10px;
+    margin: auto;
+    border: 1px solid #000000;
+  }
+  
+  .form-p {
+    padding: 5px;
+  }
+  
+  input[type="text"],
+  input[type="password"] {
+    display: block;
+    width: 85%;
+    border: none;
+    border-bottom: solid 1px #fff;
+    padding: 1em;
+    font-size: 1em;
+    color: #fff;
+    margin: 35px 0 0;
+    margin-left: 8px;
+    outline: none;
+    -webkit-transition: all 0.3s cubic-bezier(0.64, 0.09, 0.08, 1);
+    transition: all 0.3s cubic-bezier(0.64, 0.09, 0.08, 1);
+    background-color: transparent;
+    
+  }
+  
+  ::-webkit-input-placeholder {
+    color: #fff;
+    font-family: 'Dosis', sans-serif;
+  }
+  
+  input[type="submit"] {
+    font-size: 1em;
+    background-color: #e42148;
+    color: #fff;
+    width: 100%;
+    height: 50px;
+    outline: none;
+    border: none;
+    /*cursor: pointer;*/
+    margin: 3em 0;
+    -webkit-transition: 0.5s all;
+    -ms-transition: 0.5s all;
+    transition: 0.5s all;
+    text-align: center;
+    letter-spacing: 1px;
+  }
+  
+  input[type="submit"]:hover {
+    background-color: #1abc9c;
+    -webkit-tranform: translateY(9px);
+    -ms-tranform: translateY(9px);
+    -o-tranform: translateY(9px);
+    transform: translateY(9px);
+  }
+  
+  .form-p {
+    margin-top: 5px;
+    font-size: 1.1em;
+    color: #fff;
+    letter-spacing: 3px;
+    text-align: center;
+  }
+  
+  .form-p a {
+    color: rgb(255, 255, 255);
+    background:rgba(0, 0, 0, 0.288);
+    text-decoration: none;
+    -webkit-transition: .5s all;
+    -ms-transition: .5s all;
+    transition: .5s all;
+  }
+  
+  .form-p a:hover {
+    color: #1abc9c;
+    background:white;
+  }
