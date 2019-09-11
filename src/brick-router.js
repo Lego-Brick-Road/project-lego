@@ -3,9 +3,9 @@
 const express = require('express');
 const apiRouter = express.Router();
 
-const Brick = require('./model/lego');
+const Brick = require('./model/brick');
 const auth = require('./middleware/auth.js');
-const getFromApi = require('./web-api-route');
+const getFromApi = require('./web-api');
 const getCookie = require('./middleware/cookies');
 
 apiRouter.get('/bricks', getCookie, auth(), getUserBricks);
@@ -75,7 +75,7 @@ function addBrickToUser (request, response, next){
 }
 
 /**
- * Function gets all bricks from a user and displays on the user collection page using ejs
+ * Function gets all bricks from a user and displays on the user collection ejs page
  * @param request
  * @param response
  * @param next
@@ -93,6 +93,11 @@ function getUserBricks (request, response, next ) {
   }
 }
 
+/**
+ * Function makes an array from all data return from bricks DB
+ * @param myBricks -> object
+ * @returns {*}
+ */
 async function makeBrickDataArray(myBricks){
   let brickArray = [];
   let keys = Object.keys(myBricks);
@@ -103,40 +108,30 @@ async function makeBrickDataArray(myBricks){
     results.quantity = brickQuantity[i];
     brickArray.push(results);
   }
-  console.log('BRICK ARRAY', brickArray);
   return brickArray;
 }
 
+/**
+ * Function finds a brick from brick database
+ * @param partNum
+ * @returns {*}
+ */
 function getBrickDataFromDB(partNum){
   return Brick.findOne({ partNum })
     .then( result => {
-      console.log('GET BRICK DATA DB- RESULT', result);
       return result;
     })
     .catch( console.log);
 }
 
-
-// Object.keys(myBricks).forEach( partNum => {
-//   console.log('PART NUM', partNum);
-//   Brick.findOne({ partNum })
-//     .then( result => {
-//       console.log('RESULT', result);
-//       brickArray.push(result);
-//     })
-//     .then(() => {
-//       console.log('BRICK ARRAY', brickArray);
-//       response.render('user-legos', { lego : brickArray});
-//     })
-//     .catch( console.log);
-// });
-
+//TODO: Edit this to access user bricks
 function editBrick ( request, response, next ) {
   return Brick.update( {partNum: request.params.partNum} , request.body)
     .then( result => response.status(200).json(result))
     .catch( error => next(error) );
 }
 
+//TODO: Still in progress
 function deleteBrick ( request, response, next ) {
   let partNum = request.params.partNum;
   let tempBricks = request.user.bricks;
