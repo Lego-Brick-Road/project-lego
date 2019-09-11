@@ -23,6 +23,7 @@ apiRouter.post('/signup', (req, res, next) => {
 
 apiRouter.post('/signin', getCookie, auth(), (req, res, next) => {
   res.cookie('auth', req.token);
+  res.set('token', req.token);
   // res.send(req.token);
   res.redirect('/classify');
 });
