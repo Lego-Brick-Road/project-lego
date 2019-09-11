@@ -27,6 +27,7 @@ apiRouter.post('/signin', getCookie, auth(), (req, res, next) => {
   res.redirect('/train');
 });
 
+// Gets cookie for auth
 function getCookie(req, res, next){
   try {
     let [auth, cookieString] = req.headers.cookie.split('=');
