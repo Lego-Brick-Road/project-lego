@@ -18,6 +18,7 @@ let brickIdInput;
 let guesses = {}; // local object storing classifiers confidence levels for each object.
 let guessCount = 0; // how many video frames has classifier tried to classify so far
 let confidenceThreshold = 0.75; // how confident does the classifier need to be before giving result
+let currentGuess; // current brick classifier has guessed
 
 function setup() {
   // Create a featureExtractor that can extract the already learned features from MobileNet
@@ -30,9 +31,67 @@ function setup() {
   video.parent('videoContainer');
 
   // Add brick to collection button
-  buttonPredict = select('#addBrick');
-  // buttonPredict.mousePressed(classify);
+  addBrickButton = select('#addBrick');
+  addBrickButton.mousePressed(addBrick);
+
+  // delete brick from collection button
+  deleteBrickButton = select('#deleteBrick');
+  deleteBrickButton.mousePressed(deleteBrick);
 }
+
+// HELPER FUNCTIONS ===========================
+
+function fetchOptions(fetchMethod) { // fetchMethod = 'POST' || 'DELETE' || 'GET' etc.
+  // sets authorization header form cookie for fetch options
+  const token = document.cookie.split('=')[1];
+  const fetchOptions = {
+    headers:{
+      'Authorization': `Bearer ${token}`,
+    },
+    method: fetchMethod,
+  };
+  return fetchOptions;
+}
+
+// API CALLS ===========================
+
+function getBrick(){
+  const URL = `${window.location.origin}/brick?partNum=${currentGuess}`;
+
+  return fetch(URL, fetchOptions('GET'))
+    .then(data=> {return data.json();})
+    .then(result=>{
+      console.log(result);
+      return result;
+    })
+    .catch(error => console.log(error));
+}
+
+function addBrick() {
+  const URL = `${window.location.origin}/brick?partNum=${currentGuess}`;
+
+  return fetch(URL, fetchOptions('POST'))
+    .then(data=> {return data.json();})
+    .then(result=>{
+      console.log(result);
+      return result;
+    })
+    .catch(error => console.log(error));
+}
+
+function deleteBrick(){
+  const URL = `${window.location.origin}/brick/${currentGuess}`;
+
+  return fetch(URL, fetchOptions('DELETE'))
+    .then(data=> {return data.json();})
+    .then(result=>{
+      console.log(result);
+      return result;
+    })
+    .catch(error => console.log(error));
+}
+
+// ======================================
 
 function modelReady(){
   select('#ModelStatus').html('FeatureExtractor(mobileNet model) Loaded');
@@ -90,9 +149,9 @@ function gotResults(err, result) {
   // after 10 guesses finish
   if((guessCount > 50 && confidentFlag) || guessCount > 200 ) {
     // get current best guess
-    let currentGuess = Object.keys(guesses).reduce((a, b) => guesses[a].average > guesses[b].average ? a : b);
+    currentGuess = Object.keys(guesses).reduce((a, b) => guesses[a].average > guesses[b].average ? a : b);
     // fetch best guess brick info from our server
-    fetchBrickInfo(currentGuess)
+    getBrick()
       .then(brickInfo => {
         // populate html with data
         select('#partName').html(`${brickInfo.name}`);
@@ -100,7 +159,7 @@ function gotResults(err, result) {
         select('#partImage').attribute('src', `${brickInfo.imgUrl}`);
       })
       .catch(error => {
-        console.log('fetchBrickInfo() ERROR', error);
+        console.log('getBrick() ERROR', error);
       });
       
     select('#result').html(`${currentGuess}`);
@@ -115,26 +174,6 @@ function gotResults(err, result) {
 
 }
 
-function fetchBrickInfo(brickNum){
-  console.log(document.cookie);
-  const URL = `${window.location.origin}/brick?partNum=${brickNum}`;
-  const token = document.cookie.split('=')[1];
-  console.log(token);
-  const fetchOptions = {
-    headers:{
-      'Authorization': `Bearer ${token}`,
-    },
-    method: 'GET',
-  };
-
-  return fetch(URL, fetchOptions)
-    .then(data=> {return data.json();})
-    .then(result=>{
-      console.log(result);
-      return result;
-    })
-    .catch(error => console.log(error));
-}
 
 // run classify function when spacebar is pressed
 function keyPressed() {
@@ -144,5 +183,3 @@ function keyPressed() {
   }
   return false; // if you want to prevent any default behaviour
 }
-
-fetchBrickInfo(6060);

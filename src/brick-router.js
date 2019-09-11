@@ -20,7 +20,6 @@ apiRouter.delete('/brick/:partNum', auth(), deleteBrick);
  * @param next
  */
 function findBrickDB(request, response, next){
-  console.log('HIT THE GET BRICK ROUTE');
   Brick.findOne({partNum: request.query.partNum})
     .then(result => {
       if(result){
@@ -97,6 +96,7 @@ function editBrick ( request, response, next ) {
 }
 
 function deleteBrick ( request, response, next ) {
+  console.log('DELETE ROUTE HIT');
   return Brick.remove( {partNum: request.params.partNum})
     .then( result => response.status(200).json(result))
     .catch(error => next(error));

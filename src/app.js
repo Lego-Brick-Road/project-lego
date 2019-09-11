@@ -1,5 +1,13 @@
 'use strict';
 
+// ========== use this code to delete all users ===========
+// const USER = require('./model/user');
+// console.log('deleteeeeeeeeeee');
+// USER.deleteMany({})
+//   .then(result => console.log(result))
+//   .catch(e => console.log(e));
+// ========================================================
+
 const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
