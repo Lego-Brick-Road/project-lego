@@ -95,9 +95,11 @@ function getUserBricks (request, response, next ) {
 async function makeBrickDataArray(myBricks){
   let brickArray = [];
   let keys = Object.keys(myBricks);
+  let brickQuantity = Object.values(myBricks);
 
   for(let i = 0; i < keys.length; i++){
     let results = await getBrickDataFromDB(keys[i]);
+    results.quantity = brickQuantity[i];
     brickArray.push(results);
   }
   console.log('BRICK ARRAY', brickArray);
