@@ -1,0 +1,54 @@
+body {
+    font-family: "trebuchet ms";
+    background: #1abc9c;
+    background-attachment: fixed;
+    text-align:center;
+  }
+  
+  h1 {
+    font-family: 'Dosis', "merienda-one";
+    text-align: center;
+    font-size: 3em;
+    color: #fff;
+    font-weight: 100;
+    text-shadow: 2px 2px #000000;
+  }
+
+  #videoContainer{
+      margin:auto; 
+      width: 48%;
+  }
+
+  ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #333;
+    top:0;
+    left:0;
+    border:1px solid rgb(255, 255, 255);
+  }
+  
+  li {
+    float: left;
+  }
+  
+  li a {
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+  }
+  
+  /* Change the link color to #111 (black) on hover */
+  li a:hover {
+    background-color: #111;
+  }
+
+  header {
+      border:1px solid white;
+      top:0;
+      left:0;
+  }
