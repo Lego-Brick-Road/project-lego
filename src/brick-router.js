@@ -33,6 +33,7 @@ function findBrickDB(request, response, next){
             newBrick.partNum = result.part_num;
             newBrick.imgUrl = result.part_img_url;
             newBrick.externalId = result.external_ids;
+            newBrick.url = result.part_url;
             newBrick.save();
             return newBrick;
           })

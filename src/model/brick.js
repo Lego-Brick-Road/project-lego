@@ -7,6 +7,7 @@ const brickSchema = mongoose.Schema({
   partNum: { type: String, required: true },
   imgUrl: { type: String},
   externalId: { type: Object },
+  url: { type: String }
 });
 
 module.exports = mongoose.model('bricks', brickSchema);
