@@ -34,7 +34,6 @@ userSchema.virtual('capabilities', {
 });
 
 userSchema.pre('findOne', async function () {
-  console.log('FIND PREHOOK RUN');
   try {
     this.populate('capabilities');
   }
