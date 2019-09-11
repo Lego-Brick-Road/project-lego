@@ -100,15 +100,6 @@ describe('Bricks Router', () => {
         expect(results.text).toEqual('{"10000":2,"22222":1}');
       });
   });
-
-  it('can edit a user\'s brick quantity', () => {
-    return mockRequest.post('/brick?partNum=22222')
-      .set('Authorization', `Bearer ${encodedToken}`)
-      .then(results => {
-        expect(results.text).toEqual('{"10000":2,"22222":1}');
-      });
-  });
-
 });
 
 describe('Errors', () => {
