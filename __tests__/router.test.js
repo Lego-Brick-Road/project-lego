@@ -11,9 +11,9 @@ const supergoose = require('cf-supergoose');
 const mockRequest = supergoose.server(server);
 
 let users = {
-  admin: { username: 'admin', password: 'password', role: 'admin', email: 'test@test.com' },
-  editor: { username: 'editor', password: 'password', role: 'editor', email: 'test@test.com' },
-  user: { username: 'user', password: 'password', role: 'user', email: 'test@test.com' },
+  admin: { username: 'admin', password: 'password', role: 'admin', email: 'test@test.com', bricks: {10000: 1}},
+  editor: { username: 'editor', password: 'password', role: 'editor', email: 'test@test.com', bricks: {10000: 1} },
+  user: { username: 'user', password: 'password', role: 'user', email: 'test@test.com', bricks: {10000: 1} },
 };
 
 let roles = {
@@ -30,6 +30,8 @@ beforeAll(async (done) => {
   done();
 });
 
+let encodedToken;
+let id;
 
 afterAll(supergoose.stopDB);
 
@@ -38,10 +40,6 @@ describe('Auth Router', () => {
   Object.keys(users).forEach(userType => {
 
     describe(`${userType} users`, () => {
-
-      let encodedToken;
-      let id;
-
       it('can create one', () => {
         return mockRequest.post('/signup')
           .send(users[userType])
@@ -73,9 +71,49 @@ describe('Auth Router', () => {
             expect(token.capabilities).toBeDefined();
           });
       });
-
     });
+  });
+});
 
+describe('Bricks Router', () => {
+
+  it('can get user bricks', () => {
+    return mockRequest.get('/bricks')
+      .set('Authorization', `Bearer ${encodedToken}`)
+      .then(results => {
+        expect(results.text).toEqual('{"10000":1}');
+      });
   });
 
+  it('can increase the quantity of a user\'s existing brick', () => {
+    return mockRequest.post('/brick?partNum=10000')
+      .set('Authorization', `Bearer ${encodedToken}`)
+      .then(results => {
+        expect(results.text).toEqual('{"10000":2}');
+      });
+  });
+
+  it('can add a new brick to a user\'s bricks', () => {
+    return mockRequest.post('/brick?partNum=22222')
+      .set('Authorization', `Bearer ${encodedToken}`)
+      .then(results => {
+        expect(results.text).toEqual('{"10000":2,"22222":1}');
+      });
+  });
+});
+
+describe('Errors', () => {
+  it('returns 404 page does not exist', () => {
+    return mockRequest.get('/random')
+      .then(results => {
+        expect(results.status).toEqual(404);
+      });
+  });
+
+  it('returns 500 when server error', () => {
+    return mockRequest.post('/signin')
+      .then(results => {
+        expect(results.status).toEqual(500);
+      });
+  });
 });
