@@ -132,18 +132,25 @@ function getBrickDataFromDB(partNum){
 // });
 
 function editBrick ( request, response, next ) {
-  return Brick.update( {partNum: request.params.partNum} , request.body)
-    .then( result => response.status(200).json(result))
-    .catch( error => next(error) );
+  let partNum = request.params.partNum;
+  let tempBricks = request.user.bricks;
+  tempBricks[partNum] = tempBricks[partNum] > 0 ? tempBricks[partNum] -1 : tempBricks[partNum];
+  console.log(tempBricks);
+  
+  request.user.update({bricks: tempBricks})
+    .then(() => {
+      console.log(tempBricks);
+      response.status(204);
+      response.send(tempBricks);
+    })
+    .catch(console.log);
 }
 
 function deleteBrick ( request, response, next ) {
   let partNum = request.params.partNum;
   let tempBricks = request.user.bricks;
 
-  console.log(partNum, tempBricks[partNum]);
   delete tempBricks[partNum];
-  console.log(partNum, tempBricks[partNum]);
 
   request.user.update({bricks: tempBricks})
     .then(() => {
