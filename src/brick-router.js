@@ -195,7 +195,7 @@ function getUserTotal(request, response, next ){
   if (request.user.bricks.length !== 0){
     const myBricks = request.user.bricks;
     const myBrickNums = Object.values(myBricks);
-    let numOfbricks = 0;
+    let numOfbricks = 1;
     let totalQuantity = 0;
 
     for (let i = 0; i < myBrickNums.length; i++) {
