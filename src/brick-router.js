@@ -7,12 +7,14 @@ const Brick = require('./model/brick');
 const auth = require('./middleware/auth.js');
 const getFromApi = require('./web-api');
 const getCookie = require('./middleware/cookies');
+const User = require('./model/user');
 
 apiRouter.get('/bricks', getCookie, auth(), getUserBricks);
 apiRouter.get('/brick/:partNum', getCookie, auth(), findBrickDB);
 apiRouter.post('/brick/:partNum',getCookie, auth(), addBrickToUser);
 apiRouter.put('/brick/:partNum', getCookie, auth(), editBrick);
 apiRouter.delete('/brick/:partNum', getCookie, auth(), deleteBrick);
+apiRouter.get('/leaderboard', getCookie, auth(), getUsers);
 
 /**
  * Function checks our bricks DB to see if we already have the brick info else get from Rebrickable API
@@ -148,5 +150,25 @@ function deleteBrick ( request, response, next ) {
   
 }
 
-module.exports = apiRouter;
 
+function getUsers(request, response, next){
+  let userArray = [];
+  User.find({})
+    .then(result => {
+      for(let i = 0; i < result.length; i++){
+        let userBricks = 0;
+        Object.values(result[i].bricks).forEach(value =>{
+          userBricks = userBricks + value;
+        })
+
+        userArray.push({user: result[i].username, total: userBricks});
+      }
+      userArray.sort((a,b)=>{
+        return b.total - a.total;
+      });
+      response.send(userArray);
+    })
+    .catch(console.log)
+};
+
+module.exports = apiRouter;
