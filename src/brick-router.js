@@ -203,5 +203,4 @@ function getUsers(request, response, next){
     })
     .catch(console.log);
 }
-
 module.exports = apiRouter;
