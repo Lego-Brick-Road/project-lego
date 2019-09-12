@@ -8,7 +8,7 @@ const express = require('express');
 const apiRouter = express.Router();
 
 const auth = require('./middleware/auth.js');
-const Rebrickable = require('./web-api');
+const RebrickableAPI = require('./rebrickable-api.js');
 const getCookie = require('./middleware/cookies');
 const Brick = require('./model/brick.js');
 
@@ -33,7 +33,7 @@ function findBrickDB(request, response, next){
         response.send(result);
 
       } else {
-        Rebrickable.getPartInfo(request.params.partNum)
+        RebrickableAPI.getPartInfo(request.params.partNum)
           .then(result => {
             let newBrick = new Brick(result);
 
