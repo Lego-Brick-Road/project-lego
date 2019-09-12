@@ -9,6 +9,8 @@ const notFound = require('./middleware/404.js');
 const authRouter = require('./auth-router.js');
 const brickRouter = require('./brick-router.js');
 
+const auth = require('./middleware/auth');
+
 require('./helper/init-roles.js')();
 
 const app = express();
@@ -22,7 +24,7 @@ app.use(express.static('./public'));
 
 // ROUTES=========================
 
-app.use('/train', express.static('public/train'));
+app.use('/train', auth('superuser') , express.static('public/train'));
 app.use('/classify', express.static('public/classify'));
 
 app.get('/', (req, res, next) => {

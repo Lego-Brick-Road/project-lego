@@ -43,10 +43,8 @@ userSchema.pre('findOne', async function () {
 });
 
 const capabilities = {
-  superuser: ['create', 'read', 'update', 'delete', 'superuser'],
-  admin: ['create', 'read', 'update', 'delete'],
-  editor: ['create', 'read', 'update'],
-  user: ['read'],
+  superuser: [ 'superuser'],
+  user: ['create', 'read', 'update', 'delete'],
 };
 
 userSchema.pre('save', async function () {

@@ -10,9 +10,11 @@ const getCookie = require('./middleware/cookies');
 
 apiRouter.get('/bricks', getCookie, auth(), getUserBricks);
 apiRouter.get('/brick/:partNum', getCookie, auth(), findBrickDB);
+apiRouter.get('/brickstotal', getCookie, auth(), getUserTotal);
 apiRouter.post('/brick/:partNum',getCookie, auth(), addBrickToUser);
 apiRouter.put('/brick/:partNum', getCookie, auth(), editBrick);
 apiRouter.delete('/brick/:partNum', getCookie, auth(), deleteBrick);
+
 
 /**
  * Function checks our bricks DB to see if we already have the brick info else get from Rebrickable API
@@ -87,6 +89,7 @@ function getUserBricks (request, response, next ) {
     makeBrickDataArray(myBricks)
       .then(brickArray => {
         response.render('user-legos', { lego : brickArray});
+        console.log(brickArray);
       });
   }
   catch (error){
@@ -109,8 +112,39 @@ async function makeBrickDataArray(myBricks){
     results.quantity = brickQuantity[i];
     brickArray.push(results);
   }
+
   return brickArray;
 }
+
+/**
+ * This function calculates the number of types of lego parts the user has and total number of legos in their collection
+ * @route GET / brickstotal
+ * @group API data
+ * @param {string} request - user's brick collection
+ * @param {string} password.query.required - user's password
+ * @returns {object} Number of lego part types and total lego parts in user's collection
+ * @returns {Error}  default - Unexpected error
+ */
+
+function getUserTotal(request, response, next ){
+  console.log('user bricks', request.user.bricks);
+  let myBricks = request.user.bricks;
+  let myBrickNums = Object.values(myBricks);
+  let numOfbricks = 1;
+  let totalQuantity = 0;
+
+  for(let i = 0; i< myBrickNums.length; i++) {
+    var numOfLegos = numOfbricks++;
+    var userTotalLegos = totalQuantity+= myBrickNums[i];
+  }
+  console.log(numOfLegos);
+  console.log(userTotalLegos);
+
+  response.send(`Number of Lego Part types: ${numOfbricks}.  Total lego parts you have: ${userTotalLegos}`);
+
+}
+
+
 
 /**
  * Function finds a brick from brick database
@@ -146,7 +180,7 @@ function deleteBrick ( request, response, next ) {
       response.send(request.user.bricks);
     })
     .catch(console.log);
-  
+
 }
 
 module.exports = apiRouter;
