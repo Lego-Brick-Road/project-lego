@@ -5,7 +5,7 @@
  */
 
 const superagent = require('superagent');
-module.exports = {}
+module.exports = {};
 
 /**
  * This function hits the Rebrickable API with part number to get part data
@@ -18,8 +18,7 @@ module.exports.getPartInfo = (partNum) => {
 
   return superagent.get(partURL)
     .then(results => {
-      let brick = JSON.parse(results.text);
-      return brick;
+      return JSON.parse(results.text);
     })
     .catch(console.log);
 };
