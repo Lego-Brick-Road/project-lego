@@ -12,6 +12,9 @@
 * Pricing information for each lego part
 * Store and return sets that the user could make based on their current lego collection
 
+## Architecture
+![UML Diagram](./project.jpg)
+
 ## Routes
 
 ##### POST /signup
