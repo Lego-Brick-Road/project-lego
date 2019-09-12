@@ -7,10 +7,10 @@
 const express = require('express');
 const apiRouter = express.Router();
 
-const Brick = require('./model/brick');
 const auth = require('./middleware/auth.js');
-const getFromApi = require('./web-api');
+const Brick = require('./model/brick');
 const getCookie = require('./middleware/cookies');
+const getFromApi = require('./web-api');
 
 apiRouter.get('/bricks', getCookie, auth(), getUserBricks);
 apiRouter.get('/brick/:partNum', getCookie, auth(), findBrickDB);
@@ -31,28 +31,23 @@ function findBrickDB(request, response, next){
     .then(result => {
       if(result){
         response.send(result);
+
       } else {
         getFromApi(request.params.partNum)
           .then(result => {
-            if (result){
-              let newBrick = new Brick(result);
-              newBrick.name = result.name;
-              newBrick.partNum = result.part_num;
-              newBrick.imgUrl = result.part_img_url;
-              newBrick.externalId = result.external_ids;
-              newBrick.save();
-              return newBrick;
-            } else {
-              return 'Rebrickable API not accessed';
-            }
-          })
-          .then(result => {
-            response.send(result);
+            let newBrick = new Brick(result);
+
+            newBrick.name = result.name;
+            newBrick.partNum = result.part_num;
+            newBrick.imgUrl = result.part_img_url;
+            newBrick.externalId = result.external_ids;
+
+            newBrick.save();
+            response.send(newBrick);
           })
           .catch(console.log);
       }
-    })
-    .catch(console.log);
+    });
 }
 
 /**
@@ -64,8 +59,8 @@ function findBrickDB(request, response, next){
  * @returns {Error}  default - Unexpected error
  */
 function addBrickToUser (request, response, next){
-  let partNum = request.params.partNum;
-  let tempBricks = request.user.bricks;
+  const partNum = request.params.partNum;
+  const tempBricks = request.user.bricks;
 
   if(request.user.bricks[partNum]){
     tempBricks[partNum] = request.user.bricks[partNum] + 1;
@@ -73,16 +68,14 @@ function addBrickToUser (request, response, next){
     request.user.update({bricks: tempBricks})
       .then(() => {
         response.send(request.user.bricks);
-      })
-      .catch(console.log);
+      });
   } else {
     tempBricks[partNum] = 1;
 
     request.user.update({bricks: tempBricks})
       .then(() => {
         response.send(request.user.bricks);
-      })
-      .catch(console.log);
+      });
   }
 }
 
@@ -95,16 +88,16 @@ function addBrickToUser (request, response, next){
  * @returns {Error}  default - Unexpected error
  */
 function getUserBricks (request, response, next ) {
-  let myBricks = request.user.bricks;
-  try {
+  if(request.user.bricks){
+    let myBricks = request.user.bricks;
     makeBrickDataArray(myBricks)
       .then(brickArray => {
         response.status(200);
         response.render('user-legos', { lego : brickArray});
       });
-  }
-  catch (error){
-    console.log(error);
+
+  } else {
+    response.send('User has no bricks!');
   }
 }
 
@@ -114,9 +107,9 @@ function getUserBricks (request, response, next ) {
  * @returns {*}
  */
 async function makeBrickDataArray(myBricks){
-  let brickArray = [];
-  let keys = Object.keys(myBricks);
-  let brickQuantity = Object.values(myBricks);
+  const brickArray = [];
+  const keys = Object.keys(myBricks);
+  const brickQuantity = Object.values(myBricks);
 
   for(let i = 0; i < keys.length; i++){
     let results = await getBrickDataFromDB(keys[i]);
@@ -176,8 +169,8 @@ function editBrick ( request, response, next ) {
  */
 //TODO: Still in progress
 function deleteBrick ( request, response, next ) {
-  let partNum = request.params.partNum;
-  let tempBricks = request.user.bricks;
+  const partNum = request.params.partNum;
+  const tempBricks = request.user.bricks;
 
   delete tempBricks[partNum];
 
@@ -186,7 +179,6 @@ function deleteBrick ( request, response, next ) {
       response.send(request.user.bricks);
     })
     .catch(console.log);
-  
 }
 
 module.exports = apiRouter;
