@@ -38,6 +38,10 @@ function setup() {
   deleteBrickButton = select('#deleteBrick');
   deleteBrickButton.mousePressed(deleteBrick);
 
+  // Minus brick from collection button
+  minusBrickButton = select('#minusBrick');
+  minusBrickButton.mousePressed(minusBrick);
+
   // set nav link for collection
   select('#collectionNav').attribute('href', `${window.location.origin}/bricks`);
 
@@ -46,12 +50,7 @@ function setup() {
 // HELPER FUNCTIONS ===========================
 
 function fetchOptions(fetchMethod) { // fetchMethod = 'POST' || 'DELETE' || 'GET' etc.
-  // sets authorization header form cookie for fetch options
-  const token = document.cookie.split('=')[1];
   const fetchOptions = {
-    headers:{
-      'Authorization': `Bearer ${token}`,
-    },
     method: fetchMethod,
   };
   return fetchOptions;
@@ -75,6 +74,18 @@ function addBrick() {
   const URL = `${window.location.origin}/brick/${currentGuess}`;
 
   return fetch(URL, fetchOptions('POST'))
+    .then(data=> {return data.json();})
+    .then(result=>{
+      console.log(result);
+      return result;
+    })
+    .catch(error => console.log(error));
+}
+
+function minusBrick() {
+  const URL = `${window.location.origin}/brick/${currentGuess}`;
+
+  return fetch(URL, fetchOptions('PUT'))
     .then(data=> {return data.json();})
     .then(result=>{
       console.log(result);

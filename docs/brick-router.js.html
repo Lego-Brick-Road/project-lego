@@ -1,4 +1,32 @@
-'use strict';
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: brick-router.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: brick-router.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>'use strict';
 /**
  * Auth Routes Module
  * @module src/brick-router
@@ -7,18 +35,16 @@
 const express = require('express');
 const apiRouter = express.Router();
 
-const auth = require('./middleware/auth.js');
 const Brick = require('./model/brick');
-const getCookie = require('./middleware/cookies');
-const User = require('./model/user');
+const auth = require('./middleware/auth.js');
 const getFromApi = require('./web-api');
+const getCookie = require('./middleware/cookies');
 
 apiRouter.get('/bricks', getCookie, auth(), getUserBricks);
 apiRouter.get('/brick/:partNum', getCookie, auth(), findBrickDB);
 apiRouter.post('/brick/:partNum',getCookie, auth(), addBrickToUser);
 apiRouter.put('/brick/:partNum', getCookie, auth(), editBrick);
 apiRouter.delete('/brick/:partNum', getCookie, auth(), deleteBrick);
-apiRouter.get('/leaderboard', getCookie, auth(), getUsers);
 
 /**
  * This function gets brick data from database or rebrickable API
@@ -33,23 +59,24 @@ function findBrickDB(request, response, next){
     .then(result => {
       if(result){
         response.send(result);
-
       } else {
         getFromApi(request.params.partNum)
           .then(result => {
             let newBrick = new Brick(result);
-
             newBrick.name = result.name;
             newBrick.partNum = result.part_num;
             newBrick.imgUrl = result.part_img_url;
             newBrick.externalId = result.external_ids;
-
             newBrick.save();
-            response.send(newBrick);
+            return newBrick;
+          })
+          .then(result => {
+            response.send(result);
           })
           .catch(console.log);
       }
-    });
+    })
+    .catch(console.log);
 }
 
 /**
@@ -61,8 +88,8 @@ function findBrickDB(request, response, next){
  * @returns {Error}  default - Unexpected error
  */
 function addBrickToUser (request, response, next){
-  const partNum = request.params.partNum;
-  const tempBricks = request.user.bricks;
+  let partNum = request.params.partNum;
+  let tempBricks = request.user.bricks;
 
   if(request.user.bricks[partNum]){
     tempBricks[partNum] = request.user.bricks[partNum] + 1;
@@ -70,14 +97,16 @@ function addBrickToUser (request, response, next){
     request.user.update({bricks: tempBricks})
       .then(() => {
         response.send(request.user.bricks);
-      });
+      })
+      .catch(console.log);
   } else {
     tempBricks[partNum] = 1;
 
     request.user.update({bricks: tempBricks})
       .then(() => {
         response.send(request.user.bricks);
-      });
+      })
+      .catch(console.log);
   }
 }
 
@@ -90,16 +119,15 @@ function addBrickToUser (request, response, next){
  * @returns {Error}  default - Unexpected error
  */
 function getUserBricks (request, response, next ) {
-  if(request.user.bricks){
-    let myBricks = request.user.bricks;
+  let myBricks = request.user.bricks;
+  try {
     makeBrickDataArray(myBricks)
       .then(brickArray => {
-        response.status(200);
         response.render('user-legos', { lego : brickArray});
       });
-
-  } else {
-    response.send('User has no bricks!');
+  }
+  catch (error){
+    console.log(error);
   }
 }
 
@@ -109,18 +137,14 @@ function getUserBricks (request, response, next ) {
  * @returns {*}
  */
 async function makeBrickDataArray(myBricks){
-  const brickArray = [];
-  const keys = Object.keys(myBricks);
-  const brickQuantity = Object.values(myBricks);
+  let brickArray = [];
+  let keys = Object.keys(myBricks);
+  let brickQuantity = Object.values(myBricks);
 
-  for(let i = 0; i < keys.length; i++){
+  for(let i = 0; i &lt; keys.length; i++){
     let results = await getBrickDataFromDB(keys[i]);
-    if (results){
-      results.quantity = brickQuantity[i];
-      brickArray.push(results);
-    } else {
-      brickArray.push({ partNum:keys[i], quantity:brickQuantity[i]});
-    }
+    results.quantity = brickQuantity[i];
+    brickArray.push(results);
   }
   return brickArray;
 }
@@ -149,16 +173,9 @@ function getBrickDataFromDB(partNum){
 
 //TODO: Edit this to access user bricks
 function editBrick ( request, response, next ) {
-  const partNum = request.params.partNum;
-  const tempBricks = request.user.bricks;
-  tempBricks[partNum] = tempBricks[partNum] > 0 ? tempBricks[partNum] -1 : tempBricks[partNum];
-  
-  request.user.update({bricks: tempBricks})
-    .then(() => {
-      response.status(204);
-      response.send(request.user.bricks);
-    })
-    .catch(console.log);
+  return Brick.update( {partNum: request.params.partNum} , request.body)
+    .then( result => response.status(200).json(result))
+    .catch( error => next(error) );
 }
 
 /**
@@ -171,37 +188,43 @@ function editBrick ( request, response, next ) {
  */
 //TODO: Still in progress
 function deleteBrick ( request, response, next ) {
-  const partNum = request.params.partNum;
-  const tempBricks = request.user.bricks;
+  let partNum = request.params.partNum;
+  let tempBricks = request.user.bricks;
 
+  console.log(partNum, tempBricks[partNum]);
   delete tempBricks[partNum];
+  console.log(partNum, tempBricks[partNum]);
 
   request.user.update({bricks: tempBricks})
     .then(() => {
       response.send(request.user.bricks);
     })
     .catch(console.log);
-}
-
-
-function getUsers(request, response, next){
-  let userArray = [];
-  User.find({})
-    .then(result => {
-      for(let i = 0; i < result.length; i++){
-        let userBricks = 0;
-        Object.values(result[i].bricks).forEach(value =>{
-          userBricks = userBricks + value;
-        });
-
-        userArray.push({user: result[i].username, total: userBricks});
-      }
-      userArray.sort((a,b)=>{
-        return b.total - a.total;
-      });
-      response.send(userArray);
-    })
-    .catch(console.log);
+  
 }
 
 module.exports = apiRouter;
+
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-src_auth-router.html">src/auth-router</a></li><li><a href="module-src_brick-router.html">src/brick-router</a></li><li><a href="module-src_middleware_404.html">src/middleware/404</a></li><li><a href="module-src_middleware_500.html">src/middleware/500</a></li><li><a href="module-src_middleware_auth.html">src/middleware/auth</a></li><li><a href="module-src_middleware_cookies.html">src/middleware/cookies</a></li><li><a href="module-src_model_user.html">src/model/user</a></li><li><a href="module-src_web-api.html">src/web-api</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.3</a> on Thu Sep 12 2019 10:48:11 GMT-0700 (Pacific Daylight Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
