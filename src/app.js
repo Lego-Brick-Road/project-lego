@@ -9,6 +9,7 @@ const notFound = require('./middleware/404.js');
 const authRouter = require('./auth-router.js');
 const brickRouter = require('./brick-router.js');
 
+// Vinicio - are you initializing all the roles again every single time you start your server?
 require('./helper/init-roles.js')();
 
 const app = express();

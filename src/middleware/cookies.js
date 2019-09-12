@@ -7,6 +7,7 @@
  */
 function getCookie(req, res, next){
   if(req.headers.cookie){
+    // vinicio - this can be const
     let [auth, cookieString] = req.headers.cookie.split('=');
     let newToken = 'bearer ' + cookieString;
     req.headers.authorization = newToken;
