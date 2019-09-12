@@ -37,7 +37,7 @@ function findBrickDB(request, response, next){
         response.send(result);
 
       } else {
-        Rebrickable.getPartInfo(request.params.partNum)
+        RebrickableAPI.getPartInfo(request.params.partNum)
           .then(result => {
             let newBrick = new Brick(result);
 

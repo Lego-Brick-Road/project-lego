@@ -1,7 +1,7 @@
 'use strict';
 /**
  * API Server Module
- * @module src/web-api
+ * @module src/rebrickable-api
  */
 
 const superagent = require('superagent');
@@ -13,7 +13,7 @@ module.exports = {};
  * @returns {*}
  */
 module.exports.getPartInfo = (partNum) => {
-  let key = process.env.KEY;
+  const key = process.env.KEY;
   const partURL = `https://rebrickable.com/api/v3/lego/parts/${partNum}/?key=${key}`;
 
   return superagent.get(partURL)
@@ -24,14 +24,6 @@ module.exports.getPartInfo = (partNum) => {
 };
 
 module.exports.getPartSets = (partNum) => {
-  let key = process.env.KEY;
-  const partURL = `https://rebrickable.com/api/v3/lego/parts/${partNum}/?key=${key}`;
-
-  return superagent.get(partURL)
-    .then(results => {
-      let brick = JSON.parse(results.text);
-      return brick;
-    })
-    .catch(console.log);
+  
 };
 
