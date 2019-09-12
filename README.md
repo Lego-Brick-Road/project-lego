@@ -45,3 +45,4 @@
 * Unit tests were done with jest -  `npm run test`
 * Lint tests were done with eslint - `npm run lint`
 * Travis CI is integrated with .travis.yml file
+
