@@ -46,10 +46,12 @@ function findBrickDB(request, response, next){
             newBrick.imgUrl = result.part_img_url;
             newBrick.externalId = result.external_ids;
 
-            newBrick.save();
-            response.send(newBrick);
+            return newBrick.save();
           })
-          .catch(console.log);
+          .then(result => {
+            response.send(result);
+          })
+          .catch(next);
       }
     });
 }
@@ -92,16 +94,15 @@ function addBrickToUser (request, response, next){
  * @returns {Error}  default - Unexpected error
  */
 function getUserBricks (request, response, next ) {
-  if(request.user.bricks){
+  if(request.user.bricks.length !== 0){
     let myBricks = request.user.bricks;
     makeBrickDataArray(myBricks)
       .then(brickArray => {
         response.status(200);
         response.render('user-legos', { lego : brickArray});
       });
-
   } else {
-    response.send('User has no bricks!');
+    next();
   }
 }
 
@@ -137,7 +138,7 @@ function getBrickDataFromDB(partNum){
     .then( result => {
       return result;
     })
-    .catch( console.log);
+    .catch(console.log);
 }
 
 /**
@@ -160,7 +161,7 @@ function editBrick ( request, response, next ) {
       response.status(204);
       response.send(request.user.bricks);
     })
-    .catch(console.log);
+    .catch(next);
 }
 
 /**
@@ -182,7 +183,7 @@ function deleteBrick ( request, response, next ) {
     .then(() => {
       response.send(request.user.bricks);
     })
-    .catch(console.log);
+    .catch(next);
 }
 
 
