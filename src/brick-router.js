@@ -10,8 +10,8 @@ const apiRouter = express.Router();
 const auth = require('./middleware/auth.js');
 const Brick = require('./model/brick');
 const getCookie = require('./middleware/cookies');
-const User = require('./model/user');
 const getFromApi = require('./web-api');
+const User = require('./model/user');
 
 apiRouter.get('/bricks', getCookie, auth(), getUserBricks);
 apiRouter.get('/brick/:partNum', getCookie, auth(), findBrickDB);

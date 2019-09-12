@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-# project-lego
-
-=======
 # Project Lego RESTful API
 
 ## Overview
@@ -49,4 +45,4 @@
 * Unit tests were done with jest -  `npm run test`
 * Lint tests were done with eslint - `npm run lint`
 * Travis CI is integrated with .travis.yml file
->>>>>>> 1c9f1a12c39123f0d89d8b3c8b9781eee482dc00
+
