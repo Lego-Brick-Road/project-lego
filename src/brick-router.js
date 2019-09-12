@@ -159,7 +159,7 @@ function getUsers(request, response, next){
         let userBricks = 0;
         Object.values(result[i].bricks).forEach(value =>{
           userBricks = userBricks + value;
-        })
+        });
 
         userArray.push({user: result[i].username, total: userBricks});
       }
@@ -168,7 +168,7 @@ function getUsers(request, response, next){
       });
       response.send(userArray);
     })
-    .catch(console.log)
-};
+    .catch(console.log);
+}
 
 module.exports = apiRouter;
