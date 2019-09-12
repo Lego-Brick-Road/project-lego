@@ -10,7 +10,7 @@ const apiRouter = express.Router();
 const auth = require('./middleware/auth.js');
 const Brick = require('./model/brick.js');
 const getCookie = require('./middleware/cookies');
-const Rebrickable = require('./rebrickable-api');
+const RebrickableAPI = require('./rebrickable-api');
 const User = require('./model/user');
 
 
@@ -37,7 +37,7 @@ function findBrickDB(request, response, next){
         response.send(result);
 
       } else {
-        Rebrickable.getPartInfo(request.params.partNum)
+        RebrickableAPI.getPartInfo(request.params.partNum)
           .then(result => {
             let newBrick = new Brick(result);
 
