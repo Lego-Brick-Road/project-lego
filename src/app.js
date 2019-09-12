@@ -64,6 +64,9 @@ app.set('view engine', 'ejs');
 expressSwagger(options);
 
 //================================
+
+app.use('/docs', express.static('docs'));
+
 app.use('*', notFound);
 app.use(errorHandler);
 

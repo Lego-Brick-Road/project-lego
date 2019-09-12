@@ -10,10 +10,8 @@ let roles = {
 };
 
 module.exports = () => {
-
   Object.keys(roles).forEach(async (userType) => {
     await new Roles(roles[userType]).save();
   });
-
 };
 

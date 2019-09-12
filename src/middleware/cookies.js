@@ -1,4 +1,8 @@
 'use strict';
+/**
+ * API Server Module
+ * @module src/middleware/cookies
+ */
 
 /**
  * Cookie middleware persists cookie throughout session

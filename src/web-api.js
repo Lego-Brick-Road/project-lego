@@ -1,11 +1,15 @@
 'use strict';
+/**
+ * API Server Module
+ * @module src/web-api
+ */
 
 const superagent = require('superagent');
 
 /**
- * Hits Rebrickable API with part number to get part data
+ * This function hits the Rebrickable API with part number to get part data
  * @param partNum
- * @returns {Promise}
+ * @returns {*}
  */
 const getFromApi = (partNum) => {
   let key = process.env.KEY;
