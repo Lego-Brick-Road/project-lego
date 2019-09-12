@@ -12,16 +12,14 @@ const superagent = require('superagent');
  * @returns {*}
  */
 const getFromApi = (partNum) => {
-  let key = process.env.KEY;
+  const key = process.env.KEY;
   const partURL = `https://rebrickable.com/api/v3/lego/parts/${partNum}/?key=${key}`;
 
   return superagent.get(partURL)
     .then(results => {
-      let brick = JSON.parse(results.text);
-      return brick;
+      return JSON.parse(results.text);
     })
     .catch(console.log);
 };
-
 
 module.exports = getFromApi;
