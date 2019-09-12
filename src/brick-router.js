@@ -8,15 +8,19 @@ const express = require('express');
 const apiRouter = express.Router();
 
 const auth = require('./middleware/auth.js');
-const RebrickableAPI = require('./rebrickable-api.js');
-const getCookie = require('./middleware/cookies');
 const Brick = require('./model/brick.js');
+const getCookie = require('./middleware/cookies');
+const getFromApi = require('./web-api');
+const Rebrickable = require('./web-api');
+const User = require('./model/user');
+
 
 apiRouter.get('/bricks', getCookie, auth(), getUserBricks);
 apiRouter.get('/brick/:partNum', getCookie, auth(), findBrickDB);
 apiRouter.post('/brick/:partNum',getCookie, auth(), addBrickToUser);
 apiRouter.put('/brick/:partNum', getCookie, auth(), editBrick);
 apiRouter.delete('/brick/:partNum', getCookie, auth(), deleteBrick);
+apiRouter.get('/leaderboard', getCookie, auth(), getUsers);
 
 /**
  * This function gets brick data from database or rebrickable API
@@ -181,5 +185,24 @@ function deleteBrick ( request, response, next ) {
     .catch(console.log);
 }
 
-module.exports = apiRouter;
 
+function getUsers(request, response, next){
+  let userArray = [];
+  User.find({})
+    .then(result => {
+      for(let i = 0; i < result.length; i++){
+        let userBricks = 0;
+        Object.values(result[i].bricks).forEach(value =>{
+          userBricks = userBricks + value;
+        });
+
+        userArray.push({user: result[i].username, total: userBricks});
+      }
+      userArray.sort((a,b)=>{
+        return b.total - a.total;
+      });
+      response.send(userArray);
+    })
+    .catch(console.log);
+}
+module.exports = apiRouter;
