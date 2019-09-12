@@ -15,10 +15,12 @@ apiRouter.put('/brick/:partNum', getCookie, auth(), editBrick);
 apiRouter.delete('/brick/:partNum', getCookie, auth(), deleteBrick);
 
 /**
- * Function checks our bricks DB to see if we already have the brick info else get from Rebrickable API
- * @param request -> part number
- * @param response -> {*}
- * @param next
+ * This function gets brick data from database or rebrickable API
+ * @route GET /brick/:partNum
+ * @group Brick
+ * @param {string} partNum.query.required - the partNum of the brick to be found
+ * @returns {object} 200 - An object with brick data
+ * @returns {Error}  default - Unexpected error
  */
 function findBrickDB(request, response, next){
   Brick.findOne({partNum: request.params.partNum})
@@ -46,10 +48,12 @@ function findBrickDB(request, response, next){
 }
 
 /**
- * Function to increment brick in user collection, or add new brick to user collection
- * @param request
- * @param response
- * @param next
+ * This function increments brick quantity in user collection, or add new brick to user collection
+ * @route POST /brick/:partNum
+ * @group Brick
+ * @param {string} partNum.query.required - the partNum of the brick to be found
+ * @returns {object} 200 - An object with all bricks that belong to the user
+ * @returns {Error}  default - Unexpected error
  */
 function addBrickToUser (request, response, next){
   let partNum = request.params.partNum;
@@ -75,10 +79,12 @@ function addBrickToUser (request, response, next){
 }
 
 /**
- * Function gets all bricks from a user and displays on the user collection ejs page
- * @param request
- * @param response
- * @param next
+ * Function gets all bricks from a user and prepares it for rendering
+ * @route GET /bricks
+ * @group Brick
+ * @param {string} request.user
+ * @returns {object} 200 - An object with all brick data from user
+ * @returns {Error}  default - Unexpected error
  */
 function getUserBricks (request, response, next ) {
   let myBricks = request.user.bricks;
@@ -124,6 +130,15 @@ function getBrickDataFromDB(partNum){
     .catch( console.log);
 }
 
+/**
+ * This function updates the quantity of bricks in user collection
+ * @route PUT /brick/:partNum
+ * @group Brick
+ * @param {string} partNum.query.required - the partNum of the brick to be updated
+ * @returns {object} 200 - An object with brick data
+ * @returns {Error}  default - Unexpected error
+ */
+
 //TODO: Edit this to access user bricks
 function editBrick ( request, response, next ) {
   return Brick.update( {partNum: request.params.partNum} , request.body)
@@ -131,6 +146,14 @@ function editBrick ( request, response, next ) {
     .catch( error => next(error) );
 }
 
+/**
+ * This function deletes bricks from user collection
+ * @route DELETE /brick/:partNum
+ * @group Brick
+ * @param {string} partNum.query.required - the partNum of the brick to be deleted
+ * @returns {object} 200 - An object with all brick data from user
+ * @returns {Error}  default - Unexpected error
+ */
 //TODO: Still in progress
 function deleteBrick ( request, response, next ) {
   let partNum = request.params.partNum;
