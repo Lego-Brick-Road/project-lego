@@ -245,7 +245,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="brick-router.js.html">brick-router.js</a>, <a href="brick-router.js.html#line62">line 62</a>
+        <a href="brick-router.js.html">brick-router.js</a>, <a href="brick-router.js.html#line67">line 67</a>
     </li></ul></dd>
     
 
@@ -424,7 +424,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="brick-router.js.html">brick-router.js</a>, <a href="brick-router.js.html#line162">line 162</a>
+        <a href="brick-router.js.html">brick-router.js</a>, <a href="brick-router.js.html#line172">line 172</a>
     </li></ul></dd>
     
 
@@ -603,7 +603,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="brick-router.js.html">brick-router.js</a>, <a href="brick-router.js.html#line147">line 147</a>
+        <a href="brick-router.js.html">brick-router.js</a>, <a href="brick-router.js.html#line151">line 151</a>
     </li></ul></dd>
     
 
@@ -782,7 +782,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="brick-router.js.html">brick-router.js</a>, <a href="brick-router.js.html#line29">line 29</a>
+        <a href="brick-router.js.html">brick-router.js</a>, <a href="brick-router.js.html#line33">line 33</a>
     </li></ul></dd>
     
 
@@ -956,7 +956,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="brick-router.js.html">brick-router.js</a>, <a href="brick-router.js.html#line129">line 129</a>
+        <a href="brick-router.js.html">brick-router.js</a>, <a href="brick-router.js.html#line136">line 136</a>
     </li></ul></dd>
     
 
@@ -1111,7 +1111,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="brick-router.js.html">brick-router.js</a>, <a href="brick-router.js.html#line93">line 93</a>
+        <a href="brick-router.js.html">brick-router.js</a>, <a href="brick-router.js.html#line96">line 96</a>
     </li></ul></dd>
     
 
@@ -1141,6 +1141,387 @@
         <li>
 <div class="param-desc">
     200 - An object with all brick data from user
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">object</span>
+
+
+    </dd>
+</dl>
+</li>
+    
+        <li>
+<div class="param-desc">
+    default - Unexpected error
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Error</span>
+
+
+    </dd>
+</dl>
+</li>
+    </ul>
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="~getUsers"><span class="type-signature">(inner) </span>getUsers<span class="signature">(request)</span><span class="type-signature"> &rarr; {object|Error}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    This function retrieves all users in db, returns an array of user objects sorted by highest number of total bricks
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>request</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">user's brick collection</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="brick-router.js.html">brick-router.js</a>, <a href="brick-router.js.html#line220">line 220</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+<ul>
+        <li>
+<div class="param-desc">
+    Array of objects containing username and total number of bricks
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">object</span>
+
+
+    </dd>
+</dl>
+</li>
+    
+        <li>
+<div class="param-desc">
+    default - Unexpected error
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Error</span>
+
+
+    </dd>
+</dl>
+</li>
+    </ul>
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="~getUserTotal"><span class="type-signature">(inner) </span>getUserTotal<span class="signature">(request)</span><span class="type-signature"> &rarr; {object|Error}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    This function calculates the number of types of lego parts the user has and total number of legos in their collection
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>request</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">user's brick collection</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>password.query.required</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">user's password</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="brick-router.js.html">brick-router.js</a>, <a href="brick-router.js.html#line194">line 194</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+<ul>
+        <li>
+<div class="param-desc">
+    Number of lego part types and total lego parts in user's collection
 </div>
 
 
@@ -1285,7 +1666,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="brick-router.js.html">brick-router.js</a>, <a href="brick-router.js.html#line111">line 111</a>
+        <a href="brick-router.js.html">brick-router.js</a>, <a href="brick-router.js.html#line114">line 114</a>
     </li></ul></dd>
     
 
@@ -1349,13 +1730,13 @@
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-src_auth-router.html">src/auth-router</a></li><li><a href="module-src_brick-router.html">src/brick-router</a></li><li><a href="module-src_middleware_404.html">src/middleware/404</a></li><li><a href="module-src_middleware_500.html">src/middleware/500</a></li><li><a href="module-src_middleware_auth.html">src/middleware/auth</a></li><li><a href="module-src_middleware_cookies.html">src/middleware/cookies</a></li><li><a href="module-src_model_user.html">src/model/user</a></li><li><a href="module-src_web-api.html">src/web-api</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-src_auth-router.html">src/auth-router</a></li><li><a href="module-src_brick-router.html">src/brick-router</a></li><li><a href="module-src_middleware_404.html">src/middleware/404</a></li><li><a href="module-src_middleware_500.html">src/middleware/500</a></li><li><a href="module-src_middleware_auth.html">src/middleware/auth</a></li><li><a href="module-src_middleware_cookies.html">src/middleware/cookies</a></li><li><a href="module-src_model_user.html">src/model/user</a></li><li><a href="module-src_rebrickable-api.html">src/rebrickable-api</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.3</a> on Thu Sep 12 2019 10:48:11 GMT-0700 (Pacific Daylight Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.3</a> on Thu Sep 12 2019 15:22:15 GMT-0700 (Pacific Daylight Time)
 </footer>
 
 <script> prettyPrint(); </script>

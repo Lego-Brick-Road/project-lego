@@ -118,8 +118,7 @@ describe('Bricks Router', () => {
         expect(results.status).toEqual(200);
       });
   });
-  
-  // TODO: check if certain function have been called
+
   it('can get a brick from DB', () => {
     return mockRequest.get('/brick/2554')
       .set('Authorization', `Bearer ${encodedToken}`)
@@ -143,7 +142,24 @@ describe('Bricks Router', () => {
         expect(results.status).toEqual(204);
       });
   });
-  
+
+  it('can get total bricks from a user', () => {
+    return mockRequest.get('/brickstotal')
+      .set('Authorization', `Bearer ${encodedToken}`)
+      .then(results => {
+        expect(results.text).toEqual('Number of Lego Part types: 1.  Total lego parts you have: 1');
+      });
+  });
+
+  it('can get a leaderboard of users', () => {
+    return mockRequest.get('/leaderboard')
+      .set('Authorization', `Bearer ${encodedToken}`)
+      .then(results => {
+        expect(results.text).toContain('admin');
+        expect(results.text).toContain('editor');
+        expect(results.text).toContain('user');
+      });
+  });
 });
 
 describe('Errors', () => {
