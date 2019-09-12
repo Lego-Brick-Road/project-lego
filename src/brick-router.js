@@ -34,13 +34,17 @@ function findBrickDB(request, response, next){
       } else {
         getFromApi(request.params.partNum)
           .then(result => {
-            let newBrick = new Brick(result);
-            newBrick.name = result.name;
-            newBrick.partNum = result.part_num;
-            newBrick.imgUrl = result.part_img_url;
-            newBrick.externalId = result.external_ids;
-            newBrick.save();
-            return newBrick;
+            if (result){
+              let newBrick = new Brick(result);
+              newBrick.name = result.name;
+              newBrick.partNum = result.part_num;
+              newBrick.imgUrl = result.part_img_url;
+              newBrick.externalId = result.external_ids;
+              newBrick.save();
+              return newBrick;
+            } else {
+              return 'Rebrickable API not accessed';
+            }
           })
           .then(result => {
             response.send(result);
@@ -95,6 +99,7 @@ function getUserBricks (request, response, next ) {
   try {
     makeBrickDataArray(myBricks)
       .then(brickArray => {
+        response.status(200);
         response.render('user-legos', { lego : brickArray});
       });
   }
@@ -115,8 +120,12 @@ async function makeBrickDataArray(myBricks){
 
   for(let i = 0; i < keys.length; i++){
     let results = await getBrickDataFromDB(keys[i]);
-    results.quantity = brickQuantity[i];
-    brickArray.push(results);
+    if (results){
+      results.quantity = brickQuantity[i];
+      brickArray.push(results);
+    } else {
+      brickArray.push({ partNum:keys[i], quantity:brickQuantity[i]});
+    }
   }
   return brickArray;
 }
@@ -145,9 +154,16 @@ function getBrickDataFromDB(partNum){
 
 //TODO: Edit this to access user bricks
 function editBrick ( request, response, next ) {
-  return Brick.update( {partNum: request.params.partNum} , request.body)
-    .then( result => response.status(200).json(result))
-    .catch( error => next(error) );
+  const partNum = request.params.partNum;
+  const tempBricks = request.user.bricks;
+  tempBricks[partNum] = tempBricks[partNum] > 0 ? tempBricks[partNum] -1 : tempBricks[partNum];
+  
+  request.user.update({bricks: tempBricks})
+    .then(() => {
+      response.status(204);
+      response.send(request.user.bricks);
+    })
+    .catch(console.log);
 }
 
 /**
@@ -163,9 +179,7 @@ function deleteBrick ( request, response, next ) {
   let partNum = request.params.partNum;
   let tempBricks = request.user.bricks;
 
-  console.log(partNum, tempBricks[partNum]);
   delete tempBricks[partNum];
-  console.log(partNum, tempBricks[partNum]);
 
   request.user.update({bricks: tempBricks})
     .then(() => {
