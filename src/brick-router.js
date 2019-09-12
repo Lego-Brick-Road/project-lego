@@ -90,14 +90,13 @@ function addBrickToUser (request, response, next){
  * @returns {Error}  default - Unexpected error
  */
 function getUserBricks (request, response, next ) {
-  if(request.user.bricks.length === 0){
+  if(request.user.bricks.length !== 0){
     let myBricks = request.user.bricks;
     makeBrickDataArray(myBricks)
       .then(brickArray => {
         response.status(200);
         response.render('user-legos', { lego : brickArray});
       });
-
   } else {
     next();
   }
