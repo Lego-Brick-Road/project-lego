@@ -35,16 +35,20 @@
 const express = require('express');
 const apiRouter = express.Router();
 
-const Brick = require('./model/brick');
 const auth = require('./middleware/auth.js');
-const getFromApi = require('./web-api');
+const Brick = require('./model/brick.js');
 const getCookie = require('./middleware/cookies');
+const Rebrickable = require('./rebrickable-api');
+const User = require('./model/user');
+
 
 apiRouter.get('/bricks', getCookie, auth(), getUserBricks);
 apiRouter.get('/brick/:partNum', getCookie, auth(), findBrickDB);
 apiRouter.post('/brick/:partNum',getCookie, auth(), addBrickToUser);
 apiRouter.put('/brick/:partNum', getCookie, auth(), editBrick);
 apiRouter.delete('/brick/:partNum', getCookie, auth(), deleteBrick);
+apiRouter.get('/brickstotal', getCookie, auth(), getUserTotal);
+apiRouter.get('/leaderboard', getCookie, auth(), getUsers);
 
 /**
  * This function gets brick data from database or rebrickable API
@@ -59,24 +63,25 @@ function findBrickDB(request, response, next){
     .then(result => {
       if(result){
         response.send(result);
+
       } else {
-        getFromApi(request.params.partNum)
+        Rebrickable.getPartInfo(request.params.partNum)
           .then(result => {
             let newBrick = new Brick(result);
+
             newBrick.name = result.name;
             newBrick.partNum = result.part_num;
             newBrick.imgUrl = result.part_img_url;
             newBrick.externalId = result.external_ids;
-            newBrick.save();
-            return newBrick;
+
+            return newBrick.save();
           })
           .then(result => {
             response.send(result);
           })
-          .catch(console.log);
+          .catch(next);
       }
-    })
-    .catch(console.log);
+    });
 }
 
 /**
@@ -88,8 +93,8 @@ function findBrickDB(request, response, next){
  * @returns {Error}  default - Unexpected error
  */
 function addBrickToUser (request, response, next){
-  let partNum = request.params.partNum;
-  let tempBricks = request.user.bricks;
+  const partNum = request.params.partNum;
+  const tempBricks = request.user.bricks;
 
   if(request.user.bricks[partNum]){
     tempBricks[partNum] = request.user.bricks[partNum] + 1;
@@ -97,16 +102,14 @@ function addBrickToUser (request, response, next){
     request.user.update({bricks: tempBricks})
       .then(() => {
         response.send(request.user.bricks);
-      })
-      .catch(console.log);
+      });
   } else {
     tempBricks[partNum] = 1;
 
     request.user.update({bricks: tempBricks})
       .then(() => {
         response.send(request.user.bricks);
-      })
-      .catch(console.log);
+      });
   }
 }
 
@@ -119,15 +122,15 @@ function addBrickToUser (request, response, next){
  * @returns {Error}  default - Unexpected error
  */
 function getUserBricks (request, response, next ) {
-  let myBricks = request.user.bricks;
-  try {
+  if(request.user.bricks.length !== 0){
+    let myBricks = request.user.bricks;
     makeBrickDataArray(myBricks)
       .then(brickArray => {
+        response.status(200);
         response.render('user-legos', { lego : brickArray});
       });
-  }
-  catch (error){
-    console.log(error);
+  } else {
+    next();
   }
 }
 
@@ -137,14 +140,18 @@ function getUserBricks (request, response, next ) {
  * @returns {*}
  */
 async function makeBrickDataArray(myBricks){
-  let brickArray = [];
-  let keys = Object.keys(myBricks);
-  let brickQuantity = Object.values(myBricks);
+  const brickArray = [];
+  const keys = Object.keys(myBricks);
+  const brickQuantity = Object.values(myBricks);
 
   for(let i = 0; i &lt; keys.length; i++){
     let results = await getBrickDataFromDB(keys[i]);
-    results.quantity = brickQuantity[i];
-    brickArray.push(results);
+    if (results){
+      results.quantity = brickQuantity[i];
+      brickArray.push(results);
+    } else {
+      brickArray.push({ partNum:keys[i], quantity:brickQuantity[i]});
+    }
   }
   return brickArray;
 }
@@ -158,8 +165,7 @@ function getBrickDataFromDB(partNum){
   return Brick.findOne({ partNum })
     .then( result => {
       return result;
-    })
-    .catch( console.log);
+    });
 }
 
 /**
@@ -170,12 +176,17 @@ function getBrickDataFromDB(partNum){
  * @returns {object} 200 - An object with brick data
  * @returns {Error}  default - Unexpected error
  */
-
-//TODO: Edit this to access user bricks
 function editBrick ( request, response, next ) {
-  return Brick.update( {partNum: request.params.partNum} , request.body)
-    .then( result => response.status(200).json(result))
-    .catch( error => next(error) );
+  const partNum = request.params.partNum;
+  const tempBricks = request.user.bricks;
+  tempBricks[partNum] = tempBricks[partNum] > 0 ? tempBricks[partNum] -1 : tempBricks[partNum];
+  
+  request.user.update({bricks: tempBricks})
+    .then(() => {
+      response.status(204);
+      response.send(request.user.bricks);
+    })
+    .catch(next);
 }
 
 /**
@@ -186,25 +197,75 @@ function editBrick ( request, response, next ) {
  * @returns {object} 200 - An object with all brick data from user
  * @returns {Error}  default - Unexpected error
  */
-//TODO: Still in progress
 function deleteBrick ( request, response, next ) {
-  let partNum = request.params.partNum;
-  let tempBricks = request.user.bricks;
+  const partNum = request.params.partNum;
+  const tempBricks = request.user.bricks;
 
-  console.log(partNum, tempBricks[partNum]);
   delete tempBricks[partNum];
-  console.log(partNum, tempBricks[partNum]);
 
   request.user.update({bricks: tempBricks})
     .then(() => {
       response.send(request.user.bricks);
     })
-    .catch(console.log);
-  
+    .catch(next);
+}
+
+/**
+ * This function calculates the number of types of lego parts the user has and total number of legos in their collection
+ * @route GET / brickstotal
+ * @group API data
+ * @param {string} request - user's brick collection
+ * @param {string} password.query.required - user's password
+ * @returns {object} Number of lego part types and total lego parts in user's collection
+ * @returns {Error}  default - Unexpected error
+ */
+function getUserTotal(request, response, next ){
+  if (request.user.bricks.length !== 0){
+    const myBricks = request.user.bricks;
+    const myBrickNums = Object.values(myBricks);
+    let numOfbricks = 1;
+    let totalQuantity = 0;
+
+    for (let i = 0; i &lt; myBrickNums.length; i++) {
+      numOfbricks = numOfbricks++;
+      totalQuantity = totalQuantity + myBrickNums[i];
+    }
+
+    response.send(`Number of Lego Part types: ${numOfbricks}.  Total lego parts you have: ${totalQuantity}`);
+  } else {
+    next();
+  }
+}
+
+/**
+ * This function retrieves all users in db, returns an array of user objects sorted by highest number of total bricks
+ * @route GET / leaderboard
+ * @group API data
+ * @param {string} request - user's brick collection
+ * @returns {object} Array of objects containing username and total number of bricks
+ * @returns {Error}  default - Unexpected error
+ */
+function getUsers(request, response, next){
+  let userArray = [];
+  User.find({})
+    .then(result => {
+      for(let i = 0; i &lt; result.length; i++){
+        let userBricks = 0;
+        Object.values(result[i].bricks).forEach(value =>{
+          userBricks = userBricks + value;
+        });
+
+        userArray.push({user: result[i].username, total: userBricks});
+      }
+      userArray.sort((a,b)=>{
+        return b.total - a.total;
+      });
+      response.send(userArray);
+    })
+    .catch(next);
 }
 
 module.exports = apiRouter;
-
 </code></pre>
         </article>
     </section>
@@ -215,13 +276,13 @@ module.exports = apiRouter;
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-src_auth-router.html">src/auth-router</a></li><li><a href="module-src_brick-router.html">src/brick-router</a></li><li><a href="module-src_middleware_404.html">src/middleware/404</a></li><li><a href="module-src_middleware_500.html">src/middleware/500</a></li><li><a href="module-src_middleware_auth.html">src/middleware/auth</a></li><li><a href="module-src_middleware_cookies.html">src/middleware/cookies</a></li><li><a href="module-src_model_user.html">src/model/user</a></li><li><a href="module-src_web-api.html">src/web-api</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-src_auth-router.html">src/auth-router</a></li><li><a href="module-src_brick-router.html">src/brick-router</a></li><li><a href="module-src_middleware_404.html">src/middleware/404</a></li><li><a href="module-src_middleware_500.html">src/middleware/500</a></li><li><a href="module-src_middleware_auth.html">src/middleware/auth</a></li><li><a href="module-src_middleware_cookies.html">src/middleware/cookies</a></li><li><a href="module-src_model_user.html">src/model/user</a></li><li><a href="module-src_rebrickable-api.html">src/rebrickable-api</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.3</a> on Thu Sep 12 2019 10:48:11 GMT-0700 (Pacific Daylight Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.3</a> on Thu Sep 12 2019 15:22:15 GMT-0700 (Pacific Daylight Time)
 </footer>
 
 <script> prettyPrint(); </script>

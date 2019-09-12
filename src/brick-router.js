@@ -184,10 +184,9 @@ function deleteBrick ( request, response, next ) {
 
 /**
  * This function calculates the number of types of lego parts the user has and total number of legos in their collection
- * @route GET / brickstotal
- * @group API data
+ * @route GET /brickstotal
+ * @group User Data
  * @param {string} request - user's brick collection
- * @param {string} password.query.required - user's password
  * @returns {object} Number of lego part types and total lego parts in user's collection
  * @returns {Error}  default - Unexpected error
  */
@@ -211,8 +210,8 @@ function getUserTotal(request, response, next ){
 
 /**
  * This function retrieves all users in db, returns an array of user objects sorted by highest number of total bricks
- * @route GET / leaderboard
- * @group API data
+ * @route GET /leaderboard
+ * @group User Data
  * @param {string} request - user's brick collection
  * @returns {object} Array of objects containing username and total number of bricks
  * @returns {Error}  default - Unexpected error
