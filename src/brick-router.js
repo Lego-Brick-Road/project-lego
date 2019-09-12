@@ -10,8 +10,7 @@ const apiRouter = express.Router();
 const auth = require('./middleware/auth.js');
 const Brick = require('./model/brick.js');
 const getCookie = require('./middleware/cookies');
-const getFromApi = require('./web-api');
-const Rebrickable = require('./web-api');
+const RebrickableAPI = require('./rebrickable-api');
 const User = require('./model/user');
 
 
