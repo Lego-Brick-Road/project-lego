@@ -92,6 +92,7 @@ function getUserBricks (request, response, next ) {
     let myBricks = request.user.bricks;
     makeBrickDataArray(myBricks)
       .then(brickArray => {
+        response.status(200);
         response.render('user-legos', { lego : brickArray});
       });
 
@@ -112,8 +113,12 @@ async function makeBrickDataArray(myBricks){
 
   for(let i = 0; i < keys.length; i++){
     let results = await getBrickDataFromDB(keys[i]);
-    results.quantity = brickQuantity[i];
-    brickArray.push(results);
+    if (results){
+      results.quantity = brickQuantity[i];
+      brickArray.push(results);
+    } else {
+      brickArray.push({ partNum:keys[i], quantity:brickQuantity[i]});
+    }
   }
   return brickArray;
 }
@@ -142,9 +147,16 @@ function getBrickDataFromDB(partNum){
 
 //TODO: Edit this to access user bricks
 function editBrick ( request, response, next ) {
-  return Brick.update( {partNum: request.params.partNum} , request.body)
-    .then( result => response.status(200).json(result))
-    .catch( error => next(error) );
+  const partNum = request.params.partNum;
+  const tempBricks = request.user.bricks;
+  tempBricks[partNum] = tempBricks[partNum] > 0 ? tempBricks[partNum] -1 : tempBricks[partNum];
+  
+  request.user.update({bricks: tempBricks})
+    .then(() => {
+      response.status(204);
+      response.send(request.user.bricks);
+    })
+    .catch(console.log);
 }
 
 /**
