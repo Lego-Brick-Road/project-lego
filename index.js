@@ -8,7 +8,6 @@ let MONGOOSE_URI = newFunction();
 
 mongoose.connect(MONGOOSE_URI, {useNewUrlParser: true});
 
-
 // Start the web server
 require('./src/app.js').start(process.env.PORT ||3000 );
 function newFunction() {
