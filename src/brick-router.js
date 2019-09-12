@@ -16,6 +16,7 @@ apiRouter.put('/brick/:partNum', getCookie, auth(), editBrick);
 apiRouter.delete('/brick/:partNum', getCookie, auth(), deleteBrick);
 
 
+
 /**
  * Function checks our bricks DB to see if we already have the brick info else get from Rebrickable API
  * @param request -> part number
