@@ -10,8 +10,7 @@ const apiRouter = express.Router();
 const auth = require('./middleware/auth.js');
 const Brick = require('./model/brick.js');
 const getCookie = require('./middleware/cookies');
-const getFromApi = require('./web-api');
-const Rebrickable = require('./web-api');
+const Rebrickable = require('./rebrickable-api');
 const User = require('./model/user');
 
 
@@ -20,6 +19,7 @@ apiRouter.get('/brick/:partNum', getCookie, auth(), findBrickDB);
 apiRouter.post('/brick/:partNum',getCookie, auth(), addBrickToUser);
 apiRouter.put('/brick/:partNum', getCookie, auth(), editBrick);
 apiRouter.delete('/brick/:partNum', getCookie, auth(), deleteBrick);
+apiRouter.get('/brickstotal', getCookie, auth(), getUserTotal);
 apiRouter.get('/leaderboard', getCookie, auth(), getUsers);
 
 /**
@@ -37,7 +37,7 @@ function findBrickDB(request, response, next){
         response.send(result);
 
       } else {
-        RebrickableAPI.getPartInfo(request.params.partNum)
+        Rebrickable.getPartInfo(request.params.partNum)
           .then(result => {
             let newBrick = new Brick(result);
 
@@ -137,8 +137,7 @@ function getBrickDataFromDB(partNum){
   return Brick.findOne({ partNum })
     .then( result => {
       return result;
-    })
-    .catch(console.log);
+    });
 }
 
 /**
@@ -149,8 +148,6 @@ function getBrickDataFromDB(partNum){
  * @returns {object} 200 - An object with brick data
  * @returns {Error}  default - Unexpected error
  */
-
-//TODO: Edit this to access user bricks
 function editBrick ( request, response, next ) {
   const partNum = request.params.partNum;
   const tempBricks = request.user.bricks;
@@ -172,7 +169,6 @@ function editBrick ( request, response, next ) {
  * @returns {object} 200 - An object with all brick data from user
  * @returns {Error}  default - Unexpected error
  */
-//TODO: Still in progress
 function deleteBrick ( request, response, next ) {
   const partNum = request.params.partNum;
   const tempBricks = request.user.bricks;
@@ -186,7 +182,41 @@ function deleteBrick ( request, response, next ) {
     .catch(next);
 }
 
+/**
+ * This function calculates the number of types of lego parts the user has and total number of legos in their collection
+ * @route GET / brickstotal
+ * @group API data
+ * @param {string} request - user's brick collection
+ * @param {string} password.query.required - user's password
+ * @returns {object} Number of lego part types and total lego parts in user's collection
+ * @returns {Error}  default - Unexpected error
+ */
+function getUserTotal(request, response, next ){
+  if (request.user.bricks.length !== 0){
+    const myBricks = request.user.bricks;
+    const myBrickNums = Object.values(myBricks);
+    let numOfbricks = 0;
+    let totalQuantity = 0;
 
+    for (let i = 0; i < myBrickNums.length; i++) {
+      numOfbricks = numOfbricks++;
+      totalQuantity = totalQuantity + myBrickNums[i];
+    }
+
+    response.send(`Number of Lego Part types: ${numOfbricks}.  Total lego parts you have: ${totalQuantity}`);
+  } else {
+    next();
+  }
+}
+
+/**
+ * This function retrieves all users in db, returns an array of user objects sorted by highest number of total bricks
+ * @route GET / leaderboard
+ * @group API data
+ * @param {string} request - user's brick collection
+ * @returns {object} Array of objects containing username and total number of bricks
+ * @returns {Error}  default - Unexpected error
+ */
 function getUsers(request, response, next){
   let userArray = [];
   User.find({})
@@ -204,6 +234,7 @@ function getUsers(request, response, next){
       });
       response.send(userArray);
     })
-    .catch(console.log);
+    .catch(next);
 }
+
 module.exports = apiRouter;
