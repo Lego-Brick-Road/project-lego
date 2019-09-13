@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: model/user.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: model/user.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>'use strict';
+/**
+ * API Server Module
+ * @module src/model/user
+ */
+
+const mongoose = require('mongoose');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const Role = require('./role.js');
+
+const SINGLE_USE_TOKENS = !!process.env.SINGLE_USE_TOKENS;
+const TOKEN_EXPIRE = process.env.TOKEN_LIFETIME || '120m';
+const SECRET = process.env.SECRET || 'removethis';
+
+const usedTokens = new Set();
+
+const userSchema = mongoose.Schema({
+  username: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
+  email: { type: String},
+  role: { type: String, required: true, default: 'user', enum: ['user', 'admin', 'editor', 'superuser'] },
+  bricks: { type: Object , default: {}},
+}, {
+  toObject: {
+    virtuals: true,
+  },
+  toJSON: {
+    virtuals: true,
+  },
+});
+
+userSchema.virtual('capabilities', {
+  ref: 'roles',
+  localField: 'role',
+  foreignField: 'role',
+  justOne: true,
+});
+
+userSchema.pre('findOne', async function () {
+  try {
+    this.populate('capabilities');
+  }
+  catch (e) {
+    console.error('userSchema Find Prehook Error', e);
+  }
+});
+
+const capabilities = {
+  superuser: ['create', 'read', 'update', 'delete', 'superuser'],
+  admin: ['create', 'read', 'update', 'delete'],
+  editor: ['create', 'read', 'update'],
+  user: ['read'],
+};
+
+/**
+ * Pre hook uses bcrypt to hash the password, saves the Role Model if it doesn't already exist
+ */
+userSchema.pre('save', async function () {
+  if (this.isModified('password')) {
+    this.password = await bcrypt.hash(this.password, 10);
+  }
+
+  try {
+    let userRole = await Role.findOne({ role: this.role });
+    if (!userRole) {
+      userRole = new Role({ role: this.role, capabilities: capabilities[this.role] });
+      await userRole.save();
+    }
+  } catch (err) {
+    console.error(`ERROR ${err}`);
+  }
+});
+
+/**
+ * Finds a user where a token was used in bearer authentication
+ * @method authenticateToken
+ * @param token
+ * @returns {object|Error}
+ */
+userSchema.statics.authenticateToken = function (token) {
+  if (usedTokens.has(token)) {
+    return Promise.reject('Invalid Token');
+  }
+  try {
+    let parsedToken = jwt.verify(token, SECRET);
+    (SINGLE_USE_TOKENS) &amp;&amp; parsedToken.type !== 'key' &amp;&amp; usedTokens.add(token);
+    let query = { _id: parsedToken.id };
+    return this.findOne(query);
+  } catch (e) {
+    throw new Error('Invalid Token');
+  }
+};
+
+/**
+ * Finds a user where basic authentication
+ * @method authenticateBasic
+ * @param auth
+ * @returns {object} - user
+ */
+userSchema.statics.authenticateBasic = function (auth) {
+  let query = { username: auth.username };
+  return this.findOne(query)
+    .then(user => user &amp;&amp; user.comparePassword(auth.password))
+    .catch(error => { throw error; });
+};
+
+/**
+ * Uses bcrypt to check if password is valid
+ * @method comparePassword
+ * @param password
+ * @returns {object| null}
+ */
+userSchema.methods.comparePassword = function (password) {
+  return bcrypt.compare(password, this.password)
+    .then(valid => valid ? this : null);
+};
+
+/**
+ * Checks for user capabilities and expiration, generates token
+ * @method generateToken
+ * @param type
+ * @returns {*}
+ */
+userSchema.methods.generateToken = function (type) {
+  let token = {
+    id: this._id,
+    capabilities: capabilities[this.role],
+    type: type || 'user',
+  };
+
+  let options = {};
+
+  if (type !== 'key' &amp;&amp; !!TOKEN_EXPIRE) {
+    options = { expiresIn: TOKEN_EXPIRE };
+  }
+  return jwt.sign(token, SECRET, options);
+};
+
+/**
+ * Checks a user for access controls
+ * @method can
+ * @param capability
+ * @returns {*}
+ */
+userSchema.methods.can = function (capability) {
+  return capabilities[this.role].includes(capability);
+};
+
+/**
+ * Generates key that does not expire
+ * @method generateKey
+ * @returns {*}
+ */
+userSchema.methods.generateKey = function () {
+  return this.generateToken('key');
+};
+
+module.exports = mongoose.model('users', userSchema);
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-src_auth-router.html">src/auth-router</a></li><li><a href="module-src_brick-router.html">src/brick-router</a></li><li><a href="module-src_middleware_404.html">src/middleware/404</a></li><li><a href="module-src_middleware_500.html">src/middleware/500</a></li><li><a href="module-src_middleware_auth.html">src/middleware/auth</a></li><li><a href="module-src_middleware_cookies.html">src/middleware/cookies</a></li><li><a href="module-src_model_user.html">src/model/user</a></li><li><a href="module-src_rebrickable-api.html">src/rebrickable-api</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.3</a> on Thu Sep 12 2019 15:22:15 GMT-0700 (Pacific Daylight Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

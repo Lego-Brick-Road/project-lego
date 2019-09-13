@@ -1,59 +1,72 @@
 'use strict';
+/**
+ * Auth Routes Module
+ * @module src/brick-router
+ */
 
 const express = require('express');
 const apiRouter = express.Router();
 
-const Brick = require('./model/brick');
 const auth = require('./middleware/auth.js');
-const getFromApi = require('./web-api');
+const Brick = require('./model/brick.js');
 const getCookie = require('./middleware/cookies');
+const RebrickableAPI = require('./rebrickable-api');
+const User = require('./model/user');
+
 
 apiRouter.get('/bricks', getCookie, auth(), getUserBricks);
 apiRouter.get('/brick/:partNum', getCookie, auth(), findBrickDB);
 apiRouter.post('/brick/:partNum',getCookie, auth(), addBrickToUser);
 apiRouter.put('/brick/:partNum', getCookie, auth(), editBrick);
 apiRouter.delete('/brick/:partNum', getCookie, auth(), deleteBrick);
+apiRouter.get('/brickstotal', getCookie, auth(), getUserTotal);
+apiRouter.get('/leaderboard', getCookie, auth(), getUsers);
 
 /**
- * Function checks our bricks DB to see if we already have the brick info else get from Rebrickable API
- * @param request -> part number
- * @param response -> {*}
- * @param next
+ * This function gets brick data from database or rebrickable API
+ * @route GET /brick/:partNum
+ * @group Brick
+ * @param {string} partNum.query.required - the partNum of the brick to be found
+ * @returns {object} 200 - An object with brick data
+ * @returns {Error}  default - Unexpected error
  */
 function findBrickDB(request, response, next){
   Brick.findOne({partNum: request.params.partNum})
     .then(result => {
       if(result){
         response.send(result);
+
       } else {
-        getFromApi(request.params.partNum)
+        RebrickableAPI.getPartInfo(request.params.partNum)
           .then(result => {
             let newBrick = new Brick(result);
+
             newBrick.name = result.name;
             newBrick.partNum = result.part_num;
             newBrick.imgUrl = result.part_img_url;
             newBrick.externalId = result.external_ids;
-            newBrick.save();
-            return newBrick;
+
+            return newBrick.save();
           })
           .then(result => {
             response.send(result);
           })
-          .catch(console.log);
+          .catch(next);
       }
-    })
-    .catch(console.log);
+    });
 }
 
 /**
- * Function to increment brick in user collection, or add new brick to user collection
- * @param request
- * @param response
- * @param next
+ * This function increments brick quantity in user collection, or add new brick to user collection
+ * @route POST /brick/:partNum
+ * @group Brick
+ * @param {string} partNum.query.required - the partNum of the brick to be found
+ * @returns {object} 200 - An object with all bricks that belong to the user
+ * @returns {Error}  default - Unexpected error
  */
 function addBrickToUser (request, response, next){
-  let partNum = request.params.partNum;
-  let tempBricks = request.user.bricks;
+  const partNum = request.params.partNum;
+  const tempBricks = request.user.bricks;
 
   if(request.user.bricks[partNum]){
     tempBricks[partNum] = request.user.bricks[partNum] + 1;
@@ -61,35 +74,35 @@ function addBrickToUser (request, response, next){
     request.user.update({bricks: tempBricks})
       .then(() => {
         response.send(request.user.bricks);
-      })
-      .catch(console.log);
+      });
   } else {
     tempBricks[partNum] = 1;
 
     request.user.update({bricks: tempBricks})
       .then(() => {
         response.send(request.user.bricks);
-      })
-      .catch(console.log);
+      });
   }
 }
 
 /**
- * Function gets all bricks from a user and displays on the user collection ejs page
- * @param request
- * @param response
- * @param next
+ * Function gets all bricks from a user and prepares it for rendering
+ * @route GET /bricks
+ * @group Brick
+ * @param {string} request.user
+ * @returns {object} 200 - An object with all brick data from user
+ * @returns {Error}  default - Unexpected error
  */
 function getUserBricks (request, response, next ) {
-  let myBricks = request.user.bricks;
-  try {
+  if(request.user.bricks.length !== 0){
+    let myBricks = request.user.bricks;
     makeBrickDataArray(myBricks)
       .then(brickArray => {
+        response.status(200);
         response.render('user-legos', { lego : brickArray});
       });
-  }
-  catch (error){
-    console.log(error);
+  } else {
+    next();
   }
 }
 
@@ -99,14 +112,18 @@ function getUserBricks (request, response, next ) {
  * @returns {*}
  */
 async function makeBrickDataArray(myBricks){
-  let brickArray = [];
-  let keys = Object.keys(myBricks);
-  let brickQuantity = Object.values(myBricks);
+  const brickArray = [];
+  const keys = Object.keys(myBricks);
+  const brickQuantity = Object.values(myBricks);
 
   for(let i = 0; i < keys.length; i++){
     let results = await getBrickDataFromDB(keys[i]);
-    results.quantity = brickQuantity[i];
-    brickArray.push(results);
+    if (results){
+      results.quantity = brickQuantity[i];
+      brickArray.push(results);
+    } else {
+      brickArray.push({ partNum:keys[i], quantity:brickQuantity[i]});
+    }
   }
   return brickArray;
 }
@@ -120,33 +137,103 @@ function getBrickDataFromDB(partNum){
   return Brick.findOne({ partNum })
     .then( result => {
       return result;
-    })
-    .catch( console.log);
+    });
 }
 
-//TODO: Edit this to access user bricks
+/**
+ * This function updates the quantity of bricks in user collection
+ * @route PUT /brick/:partNum
+ * @group Brick
+ * @param {string} partNum.query.required - the partNum of the brick to be updated
+ * @returns {object} 200 - An object with brick data
+ * @returns {Error}  default - Unexpected error
+ */
 function editBrick ( request, response, next ) {
-  return Brick.update( {partNum: request.params.partNum} , request.body)
-    .then( result => response.status(200).json(result))
-    .catch( error => next(error) );
+  const partNum = request.params.partNum;
+  const tempBricks = request.user.bricks;
+  tempBricks[partNum] = tempBricks[partNum] > 0 ? tempBricks[partNum] -1 : tempBricks[partNum];
+  
+  request.user.update({bricks: tempBricks})
+    .then(() => {
+      response.status(204);
+      response.send(request.user.bricks);
+    })
+    .catch(next);
 }
 
-//TODO: Still in progress
+/**
+ * This function deletes bricks from user collection
+ * @route DELETE /brick/:partNum
+ * @group Brick
+ * @param {string} partNum.query.required - the partNum of the brick to be deleted
+ * @returns {object} 200 - An object with all brick data from user
+ * @returns {Error}  default - Unexpected error
+ */
 function deleteBrick ( request, response, next ) {
-  let partNum = request.params.partNum;
-  let tempBricks = request.user.bricks;
+  const partNum = request.params.partNum;
+  const tempBricks = request.user.bricks;
 
-  console.log(partNum, tempBricks[partNum]);
   delete tempBricks[partNum];
-  console.log(partNum, tempBricks[partNum]);
 
   request.user.update({bricks: tempBricks})
     .then(() => {
       response.send(request.user.bricks);
     })
-    .catch(console.log);
-  
+    .catch(next);
+}
+
+/**
+ * This function calculates the number of types of lego parts the user has and total number of legos in their collection
+ * @route GET /brickstotal
+ * @group User Data
+ * @param {string} request - user's brick collection
+ * @returns {object} Number of lego part types and total lego parts in user's collection
+ * @returns {Error}  default - Unexpected error
+ */
+function getUserTotal(request, response, next ){
+  if (request.user.bricks.length !== 0){
+    const myBricks = request.user.bricks;
+    const myBrickNums = Object.values(myBricks);
+    let numOfbricks = 1;
+    let totalQuantity = 0;
+
+    for (let i = 0; i < myBrickNums.length; i++) {
+      numOfbricks = numOfbricks++;
+      totalQuantity = totalQuantity + myBrickNums[i];
+    }
+
+    response.send(`Number of Lego Part types: ${numOfbricks}.  Total lego parts you have: ${totalQuantity}`);
+  } else {
+    next();
+  }
+}
+
+/**
+ * This function retrieves all users in db, returns an array of user objects sorted by highest number of total bricks
+ * @route GET /leaderboard
+ * @group User Data
+ * @param {string} request - user's brick collection
+ * @returns {object} Array of objects containing username and total number of bricks
+ * @returns {Error}  default - Unexpected error
+ */
+function getUsers(request, response, next){
+  let userArray = [];
+  User.find({})
+    .then(result => {
+      for(let i = 0; i < result.length; i++){
+        let userBricks = 0;
+        Object.values(result[i].bricks).forEach(value =>{
+          userBricks = userBricks + value;
+        });
+
+        userArray.push({user: result[i].username, total: userBricks});
+      }
+      userArray.sort((a,b)=>{
+        return b.total - a.total;
+      });
+      response.send(userArray);
+    })
+    .catch(next);
 }
 
 module.exports = apiRouter;
-

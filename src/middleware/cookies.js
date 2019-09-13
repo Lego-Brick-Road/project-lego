@@ -1,4 +1,8 @@
 'use strict';
+/**
+ * API Server Module
+ * @module src/middleware/cookies
+ */
 
 /**
  * Cookie middleware persists cookie throughout session
@@ -7,8 +11,8 @@
  */
 function getCookie(req, res, next){
   if(req.headers.cookie){
-    let [auth, cookieString] = req.headers.cookie.split('=');
-    let newToken = 'bearer ' + cookieString;
+    const [auth, cookieString] = req.headers.cookie.split('=');
+    const newToken = 'bearer ' + cookieString;
     req.headers.authorization = newToken;
   }
   next();

@@ -1,4 +1,8 @@
 'use strict';
+/**
+ * API Server Module
+ * @module src/model/user
+ */
 
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
@@ -49,13 +53,14 @@ const capabilities = {
   user: ['read'],
 };
 
+/**
+ * Pre hook uses bcrypt to hash the password, saves the Role Model if it doesn't already exist
+ */
 userSchema.pre('save', async function () {
-  // hash password before saving it
   if (this.isModified('password')) {
     this.password = await bcrypt.hash(this.password, 10);
   }
 
-  // if the user Role Model doesn't exist yet create it
   try {
     let userRole = await Role.findOne({ role: this.role });
     if (!userRole) {
@@ -67,6 +72,12 @@ userSchema.pre('save', async function () {
   }
 });
 
+/**
+ * Finds a user where a token was used in bearer authentication
+ * @method authenticateToken
+ * @param token
+ * @returns {object|Error}
+ */
 userSchema.statics.authenticateToken = function (token) {
   if (usedTokens.has(token)) {
     return Promise.reject('Invalid Token');
@@ -81,6 +92,12 @@ userSchema.statics.authenticateToken = function (token) {
   }
 };
 
+/**
+ * Finds a user where basic authentication
+ * @method authenticateBasic
+ * @param auth
+ * @returns {object} - user
+ */
 userSchema.statics.authenticateBasic = function (auth) {
   let query = { username: auth.username };
   return this.findOne(query)
@@ -88,12 +105,23 @@ userSchema.statics.authenticateBasic = function (auth) {
     .catch(error => { throw error; });
 };
 
+/**
+ * Uses bcrypt to check if password is valid
+ * @method comparePassword
+ * @param password
+ * @returns {object| null}
+ */
 userSchema.methods.comparePassword = function (password) {
   return bcrypt.compare(password, this.password)
     .then(valid => valid ? this : null);
 };
 
-// refactoring generate token method to check for user capabilities and expiration variable
+/**
+ * Checks for user capabilities and expiration, generates token
+ * @method generateToken
+ * @param type
+ * @returns {*}
+ */
 userSchema.methods.generateToken = function (type) {
   let token = {
     id: this._id,
@@ -109,11 +137,21 @@ userSchema.methods.generateToken = function (type) {
   return jwt.sign(token, SECRET, options);
 };
 
-// Method for checking a specify users access controls
+/**
+ * Checks a user for access controls
+ * @method can
+ * @param capability
+ * @returns {*}
+ */
 userSchema.methods.can = function (capability) {
   return capabilities[this.role].includes(capability);
 };
 
+/**
+ * Generates key that does not expire
+ * @method generateKey
+ * @returns {*}
+ */
 userSchema.methods.generateKey = function () {
   return this.generateToken('key');
 };
