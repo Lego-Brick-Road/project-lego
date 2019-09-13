@@ -52,3 +52,9 @@ body {
       top:0;
       left:0;
   }
+
+  .lego-pic{
+    border: 1px dashed black;
+    width: 250px;
+    height: 250px;
+  }
