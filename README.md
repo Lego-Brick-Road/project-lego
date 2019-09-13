@@ -15,17 +15,9 @@
 ## Architecture
 ![UML Diagram](./project.jpg)
 
-## Routes
-
-##### POST /signup
-* Required data: username and password
-* Creates a new user based on username and password provided in the body of the request.
-* Returns a token that is stored in the cookies.
-
-##### POST /signin
-* Required data: username and password
-* Signs a user in with the username and password provided in authentication header.
-* Returns a new token that is stored in the cookies.
+## Documentation
+* [Jsdocs](https://project-lego.herokuapp.com/docs/) - Functions
+* [Swagger Documentation](https://project-lego.herokuapp.com/api-docs) - Route Documentation
 
 ## Setting up locally
 ##### In .env file
@@ -39,6 +31,7 @@
 * run `npm i`
 * run `npm start` or `nodemon`
 * open new browser window, `localhost:3000`
+
 
 
 ## Testing

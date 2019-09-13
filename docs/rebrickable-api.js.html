@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: middleware/404.js</title>
+    <title>JSDoc: Source: rebrickable-api.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: middleware/404.js</h1>
+    <h1 class="page-title">Source: rebrickable-api.js</h1>
 
     
 
@@ -29,19 +29,33 @@
             <pre class="prettyprint source linenums"><code>'use strict';
 /**
  * API Server Module
- * @module src/middleware/404
+ * @module src/rebrickable-api
  */
 
+const superagent = require('superagent');
+module.exports = {};
+
 /**
- * Middleware to send error message when resource not found
- * @param req
- * @param res
- * @param next
+ * This function hits the Rebrickable API with part number to get part data
+ * @param partNum
+ * @returns {*}
  */
-module.exports = (req, res, next) => {
-  let error = { error: 'Resource Not Found' };
-  res.status(404).json(error);
-};</code></pre>
+module.exports.getPartInfo = (partNum) => {
+  const key = process.env.KEY;
+  const partURL = `https://rebrickable.com/api/v3/lego/parts/${partNum}/?key=${key}`;
+
+  return superagent.get(partURL)
+    .then(results => {
+      return JSON.parse(results.text);
+    })
+    .catch(console.log);
+};
+
+module.exports.getPartSets = (partNum) => {
+  
+};
+
+</code></pre>
         </article>
     </section>
 
