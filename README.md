@@ -1,5 +1,7 @@
 # Project Lego RESTful API
 
+[View Current Deployment](https://project-lego.herokuapp.com/classify/)
+
 ## Overview
 * This RESTful API provides the back-end functionality to create, read, update, and delete data related to lego bricks in a user's account. This provides users a way to identify and keep track of lego bricks they own. 
 
